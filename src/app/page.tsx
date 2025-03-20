@@ -1,4 +1,4 @@
-import { Datatable } from "@/components/ui";
+import { PageCard, Datatable } from "@/components/ui";
 import { Box } from "@mui/material";
 
 const columns = [
@@ -16,7 +16,7 @@ const rows = [
 export default function Listing() {
   return (
     <Box>
-     <Datatable columns={columns} rows={rows} />
+      <PageCard children={<Datatable columns={columns} rows={rows} />} />
     </Box>
   );
 }

@@ -40,10 +40,10 @@ export default function RootLayout({
           />
           <Box
             sx={{
-              maxWidth: "1420px",
+              maxWidth: "1450px",
               mx: "auto",
               px: {
-                xs: 2,
+                xs: 1,
                 sm: 3,
                 lg: 4,
               },
