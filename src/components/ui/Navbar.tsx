@@ -16,7 +16,7 @@ export function Navbar({
 }: ButtonAppBarProps) {
   return (
     <Box sx={{ flexGrow: 1, marginBottom: '10px' }}>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ py:1.5 }}>
         <Toolbar>
           <IconButton
             size="large"
@@ -25,16 +25,22 @@ export function Navbar({
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <Icon sx={{ fontSize: '50px' }} />
+            <Icon sx={{ fontSize: { xs: '30px', sm: '50px' } }} /> {/* Icono responsivo */}
           </IconButton>
-          <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h4"
+            component="div"
+            sx={{ flexGrow: 1, fontSize: { xs: '1.5rem', sm: '2.5rem' } }} // Titulo responsivo
+          >
             {title}
           </Typography>
-          {/* <Link href={buttonLink} passHref> */}
-            <Button color="inherit" component="a">
-              {buttonText}
-            </Button>
-          {/* </Link> */}
+          <Button
+            color="inherit"
+            component="a"
+            sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, textAlign: 'center' }} // Boton responsivo
+          >
+            {buttonText}
+          </Button>
         </Toolbar>
       </AppBar>
     </Box>

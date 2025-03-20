@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { Navbar } from "@/components/ui";
 import HailIcon from "@mui/icons-material/Hail";
+import { Box } from "@mui/material";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +38,21 @@ export default function RootLayout({
             buttonText="Visitar formulario"
             buttonLink=""
           />
-          {children}
+          <Box
+            sx={{
+              maxWidth: "1400px", // Equivalente a max-w-7xl
+              mx: "auto", // Equivalente a mx-auto
+              px: {
+                xs: 2, // Padrastro predeterminado para pantallas extra pequeñas
+                sm: 3, // Equivalente a sm:px-6 (24px = 3 * 8px)
+                lg: 4, // Equivalente a lg:px-8 (32px = 4 * 8px)
+              },
+              my: 3,
+            }}
+          >
+            {/* Tu contenido aquí */}
+            {children}
+          </Box>
         </AppRouterCacheProvider>
       </body>
     </html>
