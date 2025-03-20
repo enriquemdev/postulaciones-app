@@ -40,17 +40,16 @@ export default function RootLayout({
           />
           <Box
             sx={{
-              maxWidth: "1400px", // Equivalente a max-w-7xl
-              mx: "auto", // Equivalente a mx-auto
+              maxWidth: "1420px",
+              mx: "auto",
               px: {
-                xs: 2, // Padrastro predeterminado para pantallas extra pequeñas
-                sm: 3, // Equivalente a sm:px-6 (24px = 3 * 8px)
-                lg: 4, // Equivalente a lg:px-8 (32px = 4 * 8px)
+                xs: 2,
+                sm: 3,
+                lg: 4,
               },
               my: 3,
             }}
           >
-            {/* Tu contenido aquí */}
             {children}
           </Box>
         </AppRouterCacheProvider>

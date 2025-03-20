@@ -25,19 +25,19 @@ export function Navbar({
             aria-label="menu"
             sx={{ mr: 2 }}
           >
-            <Icon sx={{ fontSize: { xs: '30px', sm: '50px' } }} /> {/* Icono responsivo */}
+            <Icon sx={{ fontSize: { xs: '30px', sm: '40px' } }} /> {/* Icono responsivo */}
           </IconButton>
           <Typography
             variant="h4"
             component="div"
-            sx={{ flexGrow: 1, fontSize: { xs: '1.5rem', sm: '2.5rem' } }} // Titulo responsivo
+            sx={{ flexGrow: 1, fontSize: { xs: '1.5rem', sm: '2rem' } }} // Titulo responsivo
           >
             {title}
           </Typography>
           <Button
             color="inherit"
             component="a"
-            sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, textAlign: 'center' }} // Boton responsivo
+            sx={{ fontSize: { xs: '0.8rem', sm: '0.95rem' }, textAlign: 'center' }} // Boton responsivo
           >
             {buttonText}
           </Button>
