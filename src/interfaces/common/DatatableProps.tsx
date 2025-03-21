@@ -10,4 +10,5 @@ export interface DatatableProps {
     page: number;
     pageSize: number;
   }) => void;
+  loading: boolean;
 }

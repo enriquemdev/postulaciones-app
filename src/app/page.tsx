@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from "react";
-import { PageCard, Datatable, Titles, CustomBadge } from "@/components/ui";
+import { PageCard, Datatable, Titles, CustomBadge, Loader } from "@/components/ui";
 import { Box, Button } from "@mui/material";
 import { getApplicationsPaginated } from "@/services/applications";
 import { GridColDef } from "@mui/x-data-grid";
@@ -40,7 +40,7 @@ function ListingPageContent() {
     useState<PaginatedApplications | null>(null);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -96,7 +96,6 @@ function ListingPageContent() {
           return row.application_status.application_status_name;
         },
         renderCell: (params) => {
-          // console.log(params, params.row);
           const status_code =
             params.row.application_status.application_status_code;
           const status = params.row.application_status.application_status_name;
@@ -107,7 +106,6 @@ function ListingPageContent() {
           } else if (status_code === "seen") {
             badgeColor = "success";
           }
-          // console.log(status, badgeColor);
 
           return <CustomBadge text={status} color={badgeColor} />;
         },
@@ -157,7 +155,7 @@ function ListingPageContent() {
     []
   );
 
-  if (loading) return <div>Loading...</div>;
+  // if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -166,6 +164,8 @@ function ListingPageContent() {
         title="Tabla de Postulaciones"
         subtitle="Lista de las postulaciones registradas mediante el formulario."
       />
+      
+      <Loader isVisible={loading} height={300} onlyFirstLoad={true}/>
       {applications && (
         <Datatable
           columns={columns}
@@ -174,6 +174,7 @@ function ListingPageContent() {
           pageSize={pageSize}
           rowCount={applications.total}
           onPaginationModelChange={handlePaginationModelChange}
+          loading={loading}
         />
       )}
 

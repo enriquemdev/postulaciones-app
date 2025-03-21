@@ -35,6 +35,7 @@ export const Datatable: React.FC<DatatableProps> = ({
   pageSize,
   rowCount,
   onPaginationModelChange,
+  loading,
 }) => {
   const apiRef = useGridApiRef();
 
@@ -54,6 +55,7 @@ export const Datatable: React.FC<DatatableProps> = ({
     <>
       <ThemeProvider theme={theme}>
         <DataGrid
+          loading={loading}
           apiRef={apiRef}
           // checkboxSelection
           // disableRowSelectionOnClick
