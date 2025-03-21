@@ -6,13 +6,11 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { ButtonAppBarProps } from '@/interfaces/common';
-import Link from 'next/link';
 
 export function Navbar({
   icon: Icon,
   title,
   buttonText,
-  buttonLink,
 }: ButtonAppBarProps) {
   return (
     <Box sx={{ flexGrow: 1, marginBottom: '10px' }}>

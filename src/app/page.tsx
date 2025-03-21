@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { PageCard, Datatable, Titles, CustomBadge } from "@/components/ui";
 import { Box, Button } from "@mui/material";
 import { getApplicationsPaginated } from "@/services/applications";
@@ -66,7 +66,7 @@ function ListingPageContent() {
     setPageSize(paginationModel.pageSize);
   };
 
-  const columns: GridColDef<Application>[] = [
+  const columns: GridColDef<Application>[] = useMemo(() => [
     {
       field: "actions",
       headerName: "Acciones",
@@ -76,7 +76,10 @@ function ListingPageContent() {
           <Button
             size="small"
             variant="outlined"
-            onClick={() => handleOpenModal(params.row)}
+            onClick={() => {
+              console.log('click');
+              handleOpenModal(params.row);
+            }}
           >
             Ver
           </Button>
@@ -122,12 +125,12 @@ function ListingPageContent() {
         } else if (status_code === "seen") {
           badgeColor = "success";
         }
-        console.log(status, badgeColor);
+        // console.log(status, badgeColor);
 
         return <CustomBadge text={status} color={badgeColor} />;
       },
     },
-  ];
+  ], []);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -149,11 +152,13 @@ function ListingPageContent() {
         />
       )}
 
-      <ApplicationModal
-        open={isModalOpen}
-        onClose={handleCloseModal}
-        application={selectedApplication}
-      />
+      {selectedApplication && (
+        <ApplicationModal
+          open={isModalOpen}
+          onClose={handleCloseModal}
+          application={selectedApplication}
+        />
+      )}
     </>
   );
 }

@@ -33,7 +33,8 @@ export const Datatable: React.FC<DatatableProps> = ({ columns,
   page,
   pageSize,
   rowCount,
-  onPaginationModelChange, }) => {
+  onPaginationModelChange,
+ }) => {
   const apiRef = useGridApiRef();
 
   useEffect(() => {
