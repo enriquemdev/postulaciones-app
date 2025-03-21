@@ -51,8 +51,8 @@ export interface Application {
       created_at: string;
       updated_at: string;
     };
-    educations: any[]; // Ajusta la interfaz según la estructura de los datos
-    experiences: any[]; // Ajusta la interfaz según la estructura de los datos
+    educations: Education[];
+    experiences: Experience[];
   }
   
   export interface PaginatedApplications {
@@ -69,4 +69,30 @@ export interface Application {
     prev_page_url: string | null;
     to: number;
     total: number;
+  }
+
+  export interface Education {
+    id: number;
+    application_id: number;
+    education_degree: string;
+    education_institution: string;
+    start_date: string;
+    end_date?: string;
+    is_ongoing: boolean;
+    created_at: string;
+    updated_at: string;
+  }
+
+  export interface Experience {
+    id: number;
+    application_id: number;
+    company_name: string;
+    job_title: string;
+    start_date: string;
+    end_date?: string;
+    description?: string;
+    location?: string;
+    is_current_job: boolean;
+    created_at: string;
+    updated_at: string;
   }

@@ -5,22 +5,12 @@ import {
   DataGrid,
   useGridApiRef,
   GridToolbar,
-  GridColDef,
   GridAutosizeOptions,
-  GridRowSelectionModel,
 } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { esES } from "@mui/x-data-grid/locales";
 import { flushSync } from "react-dom";
-
-interface DatatableProps {
-  columns: GridColDef[];
-  rows: any[];
-  page: number;
-  pageSize: number;
-  rowCount: number;
-  onPaginationModelChange: (paginationModel: { page: number; pageSize: number }) => void;
-}
+import { DatatableProps } from "@/interfaces/common";
 
 const autosizeOptions: GridAutosizeOptions = {
   includeOutliers: true,
