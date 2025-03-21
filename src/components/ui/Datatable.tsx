@@ -10,6 +10,8 @@ import {
   GridAutosizeOptions,
   GridRowId,
   GridRowSelectionModel,
+  GridToolbarDensitySelector,
+  GridToolbarPageSize,
 } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { esES } from "@mui/x-data-grid/locales";
@@ -17,7 +19,11 @@ import { flushSync } from "react-dom";
 
 interface DatatableProps {
   columns: GridColDef[];
-  rows: any;
+  rows: any[];
+  page: number;
+  pageSize: number;
+  rowCount: number;
+  onPaginationModelChange: (paginationModel: { page: number; pageSize: number }) => void;
 }
 
 const autosizeOptions: GridAutosizeOptions = {
@@ -36,7 +42,12 @@ const theme = createTheme(
   esES
 );
 
-export const Datatable: React.FC<DatatableProps> = ({ columns, rows }) => {
+export const Datatable: React.FC<DatatableProps> = ({ columns,
+  rows,
+  page,
+  pageSize,
+  rowCount,
+  onPaginationModelChange, }) => {
   const apiRef = useGridApiRef();
   const [rowSelectionModel, setRowSelectionModel] = useState<string[]>([]);
 
@@ -52,9 +63,7 @@ export const Datatable: React.FC<DatatableProps> = ({ columns, rows }) => {
     };
   }, [apiRef]);
 
-  useEffect(() => {
-    console.log(rowSelectionModel);
-  }, [rowSelectionModel]);
+
 
   const handleRowSelectionChange = (newRowSelectionModel: GridRowSelectionModel) => {
     setRowSelectionModel(newRowSelectionModel.map((id) => String(id))); // Convert to string
@@ -87,9 +96,17 @@ export const Datatable: React.FC<DatatableProps> = ({ columns, rows }) => {
           ignoreDiacritics
           onRowSelectionModelChange={handleRowSelectionChange} // Use the new handler
           rowSelectionModel={rowSelectionModel}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 25 } },
-          }}
+          // initialState={{
+          //   pagination: { paginationModel: { pageSize: 25 } },
+          // }}
+          paginationMode="server" // Enable server-side pagination
+          sortingMode="server"
+          filterMode="server"
+          rowCount={rowCount} // Pass rowCount from props
+          paginationModel={{ page, pageSize }} // Pass page and pageSize from props
+          onPaginationModelChange={onPaginationModelChange} // Handle pagination change
+          pageSizeOptions={[5, 10, 15, 20, 50]}
+          
         />
       </ThemeProvider>
     </>

@@ -49,8 +49,8 @@ export default function RootLayout({
               },
               my: 3,
             }}
-          >
-            {children}
+          >{children}
+            
           </Box>
         </AppRouterCacheProvider>
       </body>
