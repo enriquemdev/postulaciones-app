@@ -361,7 +361,6 @@ export const ApplicationModal = ({
                   size="small"
                   startIcon={<Download />}
                   href={application.cv_download_url}
-                  target="_blank"
                 >
                   Descargar CV ({application.cv_pages_count} página
                   {application.cv_pages_count > 1 ? "s" : ""})

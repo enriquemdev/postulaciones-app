@@ -86,7 +86,8 @@ export const Datatable: React.FC<DatatableProps> = ({ columns,
           paginationModel={{ page, pageSize }} // Pass page and pageSize from props
           onPaginationModelChange={onPaginationModelChange} // Handle pagination change
           pageSizeOptions={[5, 10, 15, 20, 50]}
-          
+          disableRowSelectionOnClick
+          density="comfortable"
         />
       </ThemeProvider>
     </>
