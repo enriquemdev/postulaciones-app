@@ -132,7 +132,7 @@ const EducationExperienceSection = ({
                 value={`${(item as Experience).start_date} - ${
                   (item as Experience).is_current_job
                     ? "Presente"
-                    : (item as Experience).end_date
+                    : item.end_date ? ((item as Experience).end_date) : ("No especificado")
                 }`}
               />
               <Typography variant="body2" sx={{ mt: 1 }} component="div">
@@ -198,20 +198,25 @@ export const ApplicationModal = ({
             <DetailItem
               label="LinkedIn"
               value={
-                <Link href={application.applicant_linkedin} target="_blank">
-                  <LinkIcon
-                    fontSize="small"
-                    sx={{ verticalAlign: "middle", mr: 0.5 }}
-                  />
-                  {application.applicant_linkedin}
-                </Link>
+                application.applicant_linkedin ? (
+                  <Link href={application.applicant_linkedin} target="_blank">
+                    <LinkIcon
+                      fontSize="small"
+                      sx={{ verticalAlign: "middle", mr: 0.5 }}
+                    />
+                    {application.applicant_linkedin}
+                  </Link>
+                ) : (
+                  "No especificado"
+                )
               }
             />
 
             <DetailItem
               label="Portafolio"
               value={
-                <Link
+                application.applicant_portfolio_link ? (
+                  <Link
                   href={application.applicant_portfolio_link}
                   target="_blank"
                 >
@@ -221,6 +226,9 @@ export const ApplicationModal = ({
                   />
                   {application.applicant_portfolio_link}
                 </Link>
+                ) : (
+                  "No especificado"
+                )
               }
             />
           </Grid>
