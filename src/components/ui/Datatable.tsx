@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useEffect } from "react";
 import {
@@ -28,13 +28,14 @@ const theme = createTheme(
   esES
 );
 
-export const Datatable: React.FC<DatatableProps> = ({ columns,
+export const Datatable: React.FC<DatatableProps> = ({
+  columns,
   rows,
   page,
   pageSize,
   rowCount,
   onPaginationModelChange,
- }) => {
+}) => {
   const apiRef = useGridApiRef();
 
   useEffect(() => {
@@ -74,11 +75,6 @@ export const Datatable: React.FC<DatatableProps> = ({ columns,
             },
           }}
           ignoreDiacritics
-          // onRowSelectionModelChange={handleRowSelectionChange} // Use the new handler
-          // rowSelectionModel={rowSelectionModel}
-          // initialState={{
-          //   pagination: { paginationModel: { pageSize: 25 } },
-          // }}
           paginationMode="server" // Enable server-side pagination
           sortingMode="server"
           filterMode="server"
@@ -86,7 +82,7 @@ export const Datatable: React.FC<DatatableProps> = ({ columns,
           paginationModel={{ page, pageSize }} // Pass page and pageSize from props
           onPaginationModelChange={onPaginationModelChange} // Handle pagination change
           pageSizeOptions={[5, 10, 15, 20, 50]}
-          disableRowSelectionOnClick
+          // disableRowSelectionOnClick
           // density="comfortable"
         />
       </ThemeProvider>

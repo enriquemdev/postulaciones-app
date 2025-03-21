@@ -115,7 +115,6 @@ function ListingPageContent() {
       {
         field: "actions",
         headerName: "Acciones",
-        align: "center",
         renderCell: (params) =>(
           <>
             <Button
