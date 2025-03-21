@@ -6,6 +6,7 @@ import { Box, Button } from "@mui/material";
 import { getApplicationsPaginated } from "@/services/applications";
 import { GridColDef } from "@mui/x-data-grid";
 import { Application, PaginatedApplications } from "@/interfaces/applications";
+import { ApplicationModal } from "@/components/applications";
 
 export default function Listing() {
   return (
@@ -18,6 +19,21 @@ export default function Listing() {
 }
 
 function ListingPageContent() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedApplication, setSelectedApplication] =
+    useState<Application | null>(null);
+
+  // Función para abrir el modal con la aplicación seleccionada
+  const handleOpenModal = (application: Application) => {
+    setSelectedApplication(application);
+    setIsModalOpen(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedApplication(null);
+  };
   const [applications, setApplications] =
     useState<PaginatedApplications | null>(null);
   const [page, setPage] = useState(0);
@@ -57,7 +73,11 @@ function ListingPageContent() {
       width: 150,
       renderCell: (params) => (
         <>
-          <Button size="small" variant="outlined">
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={() => handleOpenModal(params.row)}
+          >
             Ver
           </Button>
           <Button size="small" variant="outlined">
@@ -89,23 +109,23 @@ function ListingPageContent() {
       headerName: "Estado de la Solicitud",
       valueGetter: (value, row) => {
         return row.application_status.application_status_name;
-      
       },
       renderCell: (params) => {
         // console.log(params, params.row);
-        const status_code = params.row.application_status.application_status_code;
+        const status_code =
+          params.row.application_status.application_status_code;
         const status = params.row.application_status.application_status_name;
         let badgeColor = "primary";
 
         if (status_code === "sent") {
-            badgeColor = "info";
+          badgeColor = "info";
         } else if (status_code === "seen") {
-            badgeColor = "success";
+          badgeColor = "success";
         }
         console.log(status, badgeColor);
 
         return <CustomBadge text={status} color={badgeColor} />;
-    },
+      },
     },
   ];
 
@@ -128,6 +148,12 @@ function ListingPageContent() {
           onPaginationModelChange={handlePaginationModelChange}
         />
       )}
+
+      <ApplicationModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        application={selectedApplication}
+      />
     </>
   );
 }
