@@ -1,4 +1,4 @@
-import { PageCard, Datatable } from "@/components/ui";
+import { PageCard, Datatable, Titles } from "@/components/ui";
 import { Box } from "@mui/material";
 
 const columns = [
@@ -16,7 +16,16 @@ const rows = [
 export default function Listing() {
   return (
     <Box>
-      <PageCard children={<Datatable columns={columns} rows={rows} />} />
+      <PageCard children={} />
     </Box>
+  );
+}
+
+function ListingPageContent() {
+  return (
+    <>
+      <Titles title="Tabla de postulaciones" />
+      <Datatable columns={columns} rows={rows} />
+    </>
   );
 }
