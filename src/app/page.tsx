@@ -16,7 +16,9 @@ const rows = [
 export default function Listing() {
   return (
     <Box>
-      <PageCard children={} />
+      <PageCard>
+        <ListingPageContent />
+      </PageCard>
     </Box>
   );
 }
@@ -24,7 +26,7 @@ export default function Listing() {
 function ListingPageContent() {
   return (
     <>
-      <Titles title="Tabla de postulaciones" />
+      <Titles title="Tabla de Postulaciones" subtitle="Lista de las postulaciones registradas mediante el formulario."/>
       <Datatable columns={columns} rows={rows} />
     </>
   );

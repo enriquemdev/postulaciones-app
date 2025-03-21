@@ -5,7 +5,7 @@ export const Titles = ({
   subtitle = "",
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }) => {
   return (
     <>
