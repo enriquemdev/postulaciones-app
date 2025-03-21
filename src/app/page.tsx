@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useMemo } from "react";
 import { PageCard, Datatable, Titles, CustomBadge } from "@/components/ui";
@@ -22,17 +22,16 @@ export default function Listing() {
 }
 
 function ListingPageContent() {
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] =
     useState<Application | null>(null);
 
-  // Función para abrir el modal con la aplicación seleccionada
   const handleOpenModal = (application: Application) => {
     setSelectedApplication(application);
     setIsModalOpen(true);
   };
 
-  // Función para cerrar el modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedApplication(null);
@@ -72,10 +71,52 @@ function ListingPageContent() {
   const columns: GridColDef<Application>[] = useMemo(
     () => [
       {
+        field: "applicant_names",
+        headerName: "Nombre Completo",
+        valueGetter: (value, row) => {
+          return `${row.applicant_names} ${row.applicant_last_names}`;
+        },
+      },
+      { field: "job_title", headerName: "Cargo Deseado" },
+      { field: "company_name", headerName: "Nombre de la Empresa" },
+      { field: "applicant_email", headerName: "Email" },
+      { field: "applicant_phone", headerName: "Teléfono" },
+      {
+        field: "employment_type.employment_type_name",
+        headerName: "Tipo de Empleo",
+        valueGetter: (value, row) => {
+          return row.employment_type.employment_type_name;
+        },
+      },
+      {
+        field: "application_status.application_status_name",
+        headerName: "Estado de la Solicitud",
+        align: "center",
+        valueGetter: (value, row) => {
+          return row.application_status.application_status_name;
+        },
+        renderCell: (params) => {
+          // console.log(params, params.row);
+          const status_code =
+            params.row.application_status.application_status_code;
+          const status = params.row.application_status.application_status_name;
+          let badgeColor = "primary";
+
+          if (status_code === "sent") {
+            badgeColor = "info";
+          } else if (status_code === "seen") {
+            badgeColor = "success";
+          }
+          // console.log(status, badgeColor);
+
+          return <CustomBadge text={status} color={badgeColor} />;
+        },
+      },
+      {
         field: "actions",
         headerName: "Acciones",
-        width: 150,
-        renderCell: (params) => (
+        align: "center",
+        renderCell: (params) =>(
           <>
             <Button
               size="small"
@@ -112,47 +153,6 @@ function ListingPageContent() {
             </Button>
           </>
         ),
-      },
-      { field: "job_title", headerName: "Cargo Deseado" },
-      { field: "company_name", headerName: "Nombre de la Empresa" },
-      {
-        field: "applicant_names",
-        headerName: "Nombre Completo",
-        valueGetter: (value, row) => {
-          return `${row.applicant_names} ${row.applicant_last_names}`;
-        },
-      },
-      { field: "applicant_email", headerName: "Email" },
-      { field: "applicant_phone", headerName: "Teléfono" },
-      {
-        field: "employment_type.employment_type_name",
-        headerName: "Tipo de Empleo",
-        valueGetter: (value, row) => {
-          return row.employment_type.employment_type_name;
-        },
-      },
-      {
-        field: "application_status.application_status_name",
-        headerName: "Estado de la Solicitud",
-        valueGetter: (value, row) => {
-          return row.application_status.application_status_name;
-        },
-        renderCell: (params) => {
-          // console.log(params, params.row);
-          const status_code =
-            params.row.application_status.application_status_code;
-          const status = params.row.application_status.application_status_name;
-          let badgeColor = "primary";
-
-          if (status_code === "sent") {
-            badgeColor = "info";
-          } else if (status_code === "seen") {
-            badgeColor = "success";
-          }
-          // console.log(status, badgeColor);
-
-          return <CustomBadge text={status} color={badgeColor} />;
-        },
       },
     ],
     []

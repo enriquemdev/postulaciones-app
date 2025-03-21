@@ -8,7 +8,6 @@ export const getApplicationsPaginated = async (
   pageSize: number
 ): Promise<PaginatedApplications> => {
   try {
-    // console.log('AAAAA', API_URL);
     const response = await axios.get(
       `${API_URL}/applications?page=${page}&per_page=${pageSize}`
     );
