@@ -1,17 +1,13 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   DataGrid,
   useGridApiRef,
   GridToolbar,
   GridColDef,
-  GridRow,
   GridAutosizeOptions,
-  GridRowId,
   GridRowSelectionModel,
-  GridToolbarDensitySelector,
-  GridToolbarPageSize,
 } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { esES } from "@mui/x-data-grid/locales";
@@ -49,7 +45,6 @@ export const Datatable: React.FC<DatatableProps> = ({ columns,
   rowCount,
   onPaginationModelChange, }) => {
   const apiRef = useGridApiRef();
-  const [rowSelectionModel, setRowSelectionModel] = useState<string[]>([]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -63,19 +58,13 @@ export const Datatable: React.FC<DatatableProps> = ({ columns,
     };
   }, [apiRef]);
 
-
-
-  const handleRowSelectionChange = (newRowSelectionModel: GridRowSelectionModel) => {
-    setRowSelectionModel(newRowSelectionModel.map((id) => String(id))); // Convert to string
-  };
-
   return (
     <>
       <ThemeProvider theme={theme}>
         <DataGrid
           apiRef={apiRef}
-          checkboxSelection
-          disableRowSelectionOnClick
+          // checkboxSelection
+          // disableRowSelectionOnClick
           columns={columns}
           rows={rows}
           autosizeOptions={autosizeOptions}
@@ -94,8 +83,8 @@ export const Datatable: React.FC<DatatableProps> = ({ columns,
             },
           }}
           ignoreDiacritics
-          onRowSelectionModelChange={handleRowSelectionChange} // Use the new handler
-          rowSelectionModel={rowSelectionModel}
+          // onRowSelectionModelChange={handleRowSelectionChange} // Use the new handler
+          // rowSelectionModel={rowSelectionModel}
           // initialState={{
           //   pagination: { paginationModel: { pageSize: 25 } },
           // }}

@@ -47,24 +47,6 @@ function ListingPageContent() {
   };
 
   const columns: GridColDef<Application>[] = [
-    { field: "job_title", headerName: "Título del Trabajo", width: 200 },
-    { field: "company_name", headerName: "Nombre de la Compañía", width: 200 },
-    { field: "applicant_names", headerName: "Nombres", width: 150 },
-    { field: "applicant_last_names", headerName: "Apellidos", width: 150 },
-    { field: "applicant_email", headerName: "Email", width: 250 },
-    { field: "applicant_phone", headerName: "Teléfono", width: 150 },
-    {
-      field: "employment_type.employment_type_name",
-      headerName: "Tipo de Empleo",
-      width: 200,
-      // valueGetter: (params) => params.row.employment_type.employment_type_name,
-    },
-    {
-      field: "application_status.application_status_name",
-      headerName: "Estado de la Solicitud",
-      width: 200,
-      // valueGetter: (params) => params.row.application_status.application_status_name,
-    },
     {
       field: "actions",
       headerName: "Acciones",
@@ -80,6 +62,29 @@ function ListingPageContent() {
         </>
       ),
     },
+    { field: "job_title", headerName: "Título del Trabajo", width: 200 },
+    { field: "company_name", headerName: "Nombre de la Compañía", width: 200 },
+    { field: "applicant_names", headerName: "Nombres", width: 150 },
+    { field: "applicant_last_names", headerName: "Apellidos", width: 150 },
+    { field: "applicant_email", headerName: "Email", width: 250 },
+    { field: "applicant_phone", headerName: "Teléfono", width: 150 },
+    {
+      field: "employment_type.employment_type_name",
+      headerName: "Tipo de Empleo",
+      width: 200,
+      valueGetter: (value, row) => {
+        return row.employment_type.employment_type_name;;
+      },
+    },
+    {
+      field: "application_status.application_status_name",
+      headerName: "Estado de la Solicitud",
+      width: 200,
+      valueGetter: (value, row) => {
+        return row.application_status.application_status_name;
+      },
+    },
+    
   ];
 
   if (loading) return <div>Loading...</div>;
