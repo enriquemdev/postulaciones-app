@@ -18,12 +18,18 @@ export const ApplicationFormValidation = [
     Yup.object({
       job_title: Yup.string().max(255).required('Requerido'),
       company_name: Yup.string().max(255).required('Requerido'),
-      employment_type_id: Yup.string().required('Requerido'),
+      employment_type_id: Yup.number()
+      .oneOf([1, 2], 'Seleccione una opción válida')
+      .required('Requerido'),
       monthly_expected_salary: Yup.string()
         .matches(/^\d+(\.\d{1,2})?$/, 'Formato inválido')
         .required('Requerido'),
-      availability_id: Yup.string().required('Requerido'),
-      work_modality_id: Yup.string().required('Requerido'),
+      availability_id: Yup.number()
+      .oneOf([1, 2], 'Seleccione una opción válida')
+      .required('Requerido'),
+      work_modality_id: Yup.number()
+      .oneOf([1, 2], 'Seleccione una opción válida')
+      .required('Requerido'),
       cv: Yup.mixed()
         .required('Requerido')
         .test('fileType', 'Solo PDF', (value) => value && value.type === 'application/pdf')

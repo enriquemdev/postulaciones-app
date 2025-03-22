@@ -1,7 +1,7 @@
 export const ApplicationFormInitialValues = {
     job_title: "",
     company_name: "",
-    employment_type_id: "",
+    employment_type_id: "1",
     applicant_names: "",
     applicant_last_names: "",
     applicant_email: "",
@@ -13,8 +13,8 @@ export const ApplicationFormInitialValues = {
     applicant_address: "",
     cv: null,
     monthly_expected_salary: "",
-    availability_id: "",
-    work_modality_id: "",
+    availability_id: "1",
+    work_modality_id: "1",
     educations: [],
-    experiences: [],
+      experiences: []
   }
