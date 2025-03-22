@@ -32,12 +32,26 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AppRouterCacheProvider>
+
           <Navbar
             icon={HailIcon}
             title="Postulaciones App"
             buttonText="Visitar formulario"
-            buttonLink=""
+            routes={[
+              {
+                path: '/',
+                text: 'Ver formulario',
+                url: '/form',
+              },
+              {
+                path: '/form',
+                text: 'Ver lista',
+                url: '/',
+              },
+            ]}
+
           />
+
           <Box
             sx={{
               maxWidth: "1450px",

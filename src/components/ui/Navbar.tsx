@@ -1,4 +1,3 @@
-// app/components/Navbar.tsx
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -8,24 +7,13 @@ import IconButton from '@mui/material/IconButton';
 import { ButtonAppBarProps } from '@/interfaces/common';
 import { DynamicButton } from '@/components/ui';
 
-// Tipado para las rutas
-interface RouteConfig {
-  path: string;
-  text: string;
-  url: string;
-}
-
 export function Navbar({
   icon: Icon,
   title,
   routes = [],
   defaultButtonText = "Home",
   defaultButtonUrl = "/",
-}: ButtonAppBarProps & {
-  routes?: RouteConfig[];
-  defaultButtonText?: string;
-  defaultButtonUrl?: string;
-}) {
+}: ButtonAppBarProps) {
   return (
     <Box sx={{ flexGrow: 1, marginBottom: '10px' }}>
       <AppBar position="static" sx={{ py: 1.5 }}>
