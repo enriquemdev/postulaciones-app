@@ -18,25 +18,8 @@ import {
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-
-// Tipos basados en las reglas de Laravel
-interface Education {
-  education_degree: string;
-  education_institution: string;
-  start_date: string;
-  end_date?: string;
-  is_ongoing: boolean;
-}
-
-interface Experience {
-  company_name: string;
-  job_title: string;
-  start_date: string;
-  end_date?: string;
-  description?: string;
-  location?: string;
-  is_current_job: boolean;
-}
+import { Education, Experience } from '@/interfaces/applications';
+import { debounce } from 'lodash';
 
 interface FormValues {
   job_title: string;
@@ -203,7 +186,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_names"
               label="Nombres"
               value={formik.values.applicant_names}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_names && Boolean(formik.errors.applicant_names)}
               helperText={formik.touched.applicant_names && formik.errors.applicant_names}
               fullWidth
@@ -212,7 +195,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_last_names"
               label="Apellidos"
               value={formik.values.applicant_last_names}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_last_names && Boolean(formik.errors.applicant_last_names)}
               helperText={formik.touched.applicant_last_names && formik.errors.applicant_last_names}
               fullWidth
@@ -222,7 +205,7 @@ const JobApplicationForm: React.FC = () => {
               label="Email"
               type="email"
               value={formik.values.applicant_email}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_email && Boolean(formik.errors.applicant_email)}
               helperText={formik.touched.applicant_email && formik.errors.applicant_email}
               fullWidth
@@ -231,7 +214,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_phone"
               label="Teléfono"
               value={formik.values.applicant_phone}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_phone && Boolean(formik.errors.applicant_phone)}
               helperText={formik.touched.applicant_phone && formik.errors.applicant_phone}
               fullWidth
@@ -240,7 +223,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_linkedin"
               label="LinkedIn (opcional)"
               value={formik.values.applicant_linkedin}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_linkedin && Boolean(formik.errors.applicant_linkedin)}
               helperText={formik.touched.applicant_linkedin && formik.errors.applicant_linkedin}
               fullWidth
@@ -249,7 +232,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_portfolio_link"
               label="Portafolio (opcional)"
               value={formik.values.applicant_portfolio_link}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_portfolio_link && Boolean(formik.errors.applicant_portfolio_link)}
               helperText={formik.touched.applicant_portfolio_link && formik.errors.applicant_portfolio_link}
               fullWidth
@@ -258,7 +241,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_country"
               label="País"
               value={formik.values.applicant_country}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_country && Boolean(formik.errors.applicant_country)}
               helperText={formik.touched.applicant_country && formik.errors.applicant_country}
               fullWidth
@@ -267,7 +250,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_city"
               label="Ciudad"
               value={formik.values.applicant_city}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_city && Boolean(formik.errors.applicant_city)}
               helperText={formik.touched.applicant_city && formik.errors.applicant_city}
               fullWidth
@@ -276,7 +259,7 @@ const JobApplicationForm: React.FC = () => {
               name="applicant_address"
               label="Dirección"
               value={formik.values.applicant_address}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.applicant_address && Boolean(formik.errors.applicant_address)}
               helperText={formik.touched.applicant_address && formik.errors.applicant_address}
               fullWidth
@@ -290,7 +273,7 @@ const JobApplicationForm: React.FC = () => {
               name="job_title"
               label="Título del empleo"
               value={formik.values.job_title}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.job_title && Boolean(formik.errors.job_title)}
               helperText={formik.touched.job_title && formik.errors.job_title}
               fullWidth
@@ -299,7 +282,7 @@ const JobApplicationForm: React.FC = () => {
               name="company_name"
               label="Nombre de la empresa"
               value={formik.values.company_name}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.company_name && Boolean(formik.errors.company_name)}
               helperText={formik.touched.company_name && formik.errors.company_name}
               fullWidth
@@ -309,7 +292,7 @@ const JobApplicationForm: React.FC = () => {
               name="employment_type_id"
               label="Tipo de empleo"
               value={formik.values.employment_type_id}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.employment_type_id && Boolean(formik.errors.employment_type_id)}
               helperText={formik.touched.employment_type_id && formik.errors.employment_type_id}
               fullWidth
@@ -322,7 +305,7 @@ const JobApplicationForm: React.FC = () => {
               name="monthly_expected_salary"
               label="Salario mensual esperado"
               value={formik.values.monthly_expected_salary}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.monthly_expected_salary && Boolean(formik.errors.monthly_expected_salary)}
               helperText={formik.touched.monthly_expected_salary && formik.errors.monthly_expected_salary}
               fullWidth
@@ -332,7 +315,7 @@ const JobApplicationForm: React.FC = () => {
               name="availability_id"
               label="Disponibilidad"
               value={formik.values.availability_id}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.availability_id && Boolean(formik.errors.availability_id)}
               helperText={formik.touched.availability_id && formik.errors.availability_id}
               fullWidth
@@ -346,7 +329,7 @@ const JobApplicationForm: React.FC = () => {
               name="work_modality_id"
               label="Modalidad de trabajo"
               value={formik.values.work_modality_id}
-              onChange={formik.handleChange}
+              onChange={debouncedHandleChange}
               error={formik.touched.work_modality_id && Boolean(formik.errors.work_modality_id)}
               helperText={formik.touched.work_modality_id && formik.errors.work_modality_id}
               fullWidth
@@ -380,7 +363,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`educations[${index}].education_degree`}
                   label="Título"
                   value={edu.education_degree}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.educations?.[index]?.education_degree &&
                     Boolean(formik.errors.educations?.[index]?.education_degree)
@@ -395,7 +378,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`educations[${index}].education_institution`}
                   label="Institución"
                   value={edu.education_institution}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.educations?.[index]?.education_institution &&
                     Boolean(formik.errors.educations?.[index]?.education_institution)
@@ -411,7 +394,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`educations[${index}].start_date`}
                   label="Fecha de inicio"
                   value={edu.start_date}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.educations?.[index]?.start_date &&
                     Boolean(formik.errors.educations?.[index]?.start_date)
@@ -428,7 +411,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`educations[${index}].end_date`}
                   label="Fecha de fin"
                   value={edu.end_date}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.educations?.[index]?.end_date &&
                     Boolean(formik.errors.educations?.[index]?.end_date)
@@ -479,7 +462,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`experiences[${index}].company_name`}
                   label="Empresa"
                   value={exp.company_name}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.experiences?.[index]?.company_name &&
                     Boolean(formik.errors.experiences?.[index]?.company_name)
@@ -494,7 +477,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`experiences[${index}].job_title`}
                   label="Título del puesto"
                   value={exp.job_title}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.experiences?.[index]?.job_title &&
                     Boolean(formik.errors.experiences?.[index]?.job_title)
@@ -510,7 +493,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`experiences[${index}].start_date`}
                   label="Fecha de inicio"
                   value={exp.start_date}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.experiences?.[index]?.start_date &&
                     Boolean(formik.errors.experiences?.[index]?.start_date)
@@ -527,7 +510,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`experiences[${index}].end_date`}
                   label="Fecha de fin"
                   value={exp.end_date}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   error={
                     formik.touched.experiences?.[index]?.end_date &&
                     Boolean(formik.errors.experiences?.[index]?.end_date)
@@ -544,7 +527,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`experiences[${index}].description`}
                   label="Descripción"
                   value={exp.description}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   multiline
                   rows={3}
                   fullWidth
@@ -553,7 +536,7 @@ const JobApplicationForm: React.FC = () => {
                   name={`experiences[${index}].location`}
                   label="Ubicación"
                   value={exp.location}
-                  onChange={formik.handleChange}
+                  onChange={debouncedHandleChange}
                   fullWidth
                 />
                 <FormControlLabel
@@ -562,7 +545,7 @@ const JobApplicationForm: React.FC = () => {
                       name={`experiences[${index}].is_current_job`}
                       checked={exp.is_current_job}
                       onChange={(e) => {
-                        formik.handleChange(e);
+                        debouncedHandleChange(e);
                         if (e.target.checked) {
                           formik.setFieldValue(`experiences[${index}].end_date`, '');
                         }
@@ -594,6 +577,9 @@ const JobApplicationForm: React.FC = () => {
         return null;
     }
   };
+
+    // For performance
+    const debouncedHandleChange = debounce(formik.handleChange, 200);
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
