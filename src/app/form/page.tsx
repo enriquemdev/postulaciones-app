@@ -16,8 +16,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { submitApplication } from "@/services/applications";
-
+import axios from "axios";
 import {
   Education,
   Experience,
@@ -35,20 +34,64 @@ const steps = [
   "Experiencia Laboral",
 ];
 
+const adjustedInitialValues: ApplicationFormInputs = {
+  ...ApplicationFormInitialValues,
+  educations: [
+    { education_degree: "", education_institution: "", start_date: "", end_date: "", is_ongoing: false },
+  ],
+  experiences: [
+    { company_name: "", job_title: "", start_date: "", end_date: "", description: "", location: "", is_current_job: false },
+  ],
+};
+
 export const ApplicationForm: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formik = useFormik<ApplicationFormInputs>({
-    initialValues: ApplicationFormInitialValues,
+    initialValues: adjustedInitialValues,
     validationSchema: ApplicationFormValidation[activeStep],
     validateOnChange: false,
     validateOnBlur: true,
     onSubmit: async (values) => {
       if (activeStep === steps.length - 1) {
         setIsSubmitting(true);
+        const formData = new FormData();
+
+        // Manejar todos los campos excepto educations y experiences primero
+        Object.entries(values).forEach(([key, value]) => {
+          if (key === "cv" && value) {
+            formData.append(key, value);
+          } else if (key !== "educations" && key !== "experiences") {
+            formData.append(key, String(value));
+          }
+        });
+
+        // Añadir educations como un arreglo explícito
+        values.educations.forEach((edu, index) => {
+          formData.append(`educations[${index}][education_degree]`, edu.education_degree || "");
+          formData.append(`educations[${index}][education_institution]`, edu.education_institution || "");
+          formData.append(`educations[${index}][start_date]`, edu.start_date || "");
+          formData.append(`educations[${index}][end_date]`, edu.end_date || "");
+          formData.append(`educations[${index}][is_ongoing]`, String(edu.is_ongoing ? 1 : 0));
+        });
+
+        // Añadir experiences como un arreglo explícito
+        values.experiences.forEach((exp, index) => {
+          formData.append(`experiences[${index}][company_name]`, exp.company_name || "");
+          formData.append(`experiences[${index}][job_title]`, exp.job_title || "");
+          formData.append(`experiences[${index}][start_date]`, exp.start_date || "");
+          formData.append(`experiences[${index}][end_date]`, exp.end_date || "");
+          formData.append(`experiences[${index}][description]`, exp.description || "");
+          formData.append(`experiences[${index}][location]`, exp.location || "");
+          formData.append(`experiences[${index}][is_current_job]`, String(exp.is_current_job ? 1 : 0));
+        });
+
+        const API_URL = process.env.NEXT_PUBLIC_API_URL;
         try {
-          await submitApplication(values);
+          await axios.post(`${API_URL}/applications`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
           alert("Postulación enviada con éxito");
           formik.resetForm();
           setActiveStep(0);
@@ -314,8 +357,13 @@ const JobInfoStep2 = React.memo(({ formik }: { formik: any }) => {
 JobInfoStep2.displayName = "JobInfoStep2";
 
 const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
+  const handleRemoveEducation = (index: number) => {
+    const newEducations = formik.values.educations.filter((_, i) => i !== index);
+    formik.setFieldValue("educations", newEducations);
+  };
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
       {formik.values.educations.map((edu: Education, index: number) => (
         <Box key={index} sx={{ border: 1, p: 2, borderRadius: 1 }}>
           <TextField
@@ -327,6 +375,7 @@ const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
             error={formik.touched.educations?.[index]?.education_degree && Boolean(formik.errors.educations?.[index]?.education_degree)}
             helperText={formik.touched.educations?.[index]?.education_degree && formik.errors.educations?.[index]?.education_degree}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             name={`educations[${index}].education_institution`}
@@ -337,6 +386,7 @@ const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
             error={formik.touched.educations?.[index]?.education_institution && Boolean(formik.errors.educations?.[index]?.education_institution)}
             helperText={formik.touched.educations?.[index]?.education_institution && formik.errors.educations?.[index]?.education_institution}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             type="date"
@@ -349,6 +399,7 @@ const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
             helperText={formik.touched.educations?.[index]?.start_date && formik.errors.educations?.[index]?.start_date}
             InputLabelProps={{ shrink: true }}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             type="date"
@@ -362,6 +413,7 @@ const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
             InputLabelProps={{ shrink: true }}
             disabled={edu.is_ongoing}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <FormControlLabel
             control={
@@ -379,13 +431,23 @@ const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
             }
             label="En curso"
           />
+          {index > 0 && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => handleRemoveEducation(index)}
+              sx={{ mt: 2 }}
+            >
+              Eliminar Educación
+            </Button>
+          )}
         </Box>
       ))}
       <Button
         onClick={() =>
           formik.setFieldValue("educations", [
             ...formik.values.educations,
-            { education_degree: "", education_institution: "", start_date: "", is_ongoing: false },
+            { education_degree: "", education_institution: "", start_date: "", end_date: "", is_ongoing: false },
           ])
         }
       >
@@ -397,8 +459,13 @@ const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
 EducationInfoStep3.displayName = "EducationInfoStep3";
 
 const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
+  const handleRemoveExperience = (index: number) => {
+    const newExperiences = formik.values.experiences.filter((_, i) => i !== index);
+    formik.setFieldValue("experiences", newExperiences);
+  };
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
       {formik.values.experiences.map((exp: Experience, index: number) => (
         <Box key={index} sx={{ border: 1, p: 2, borderRadius: 1 }}>
           <TextField
@@ -410,6 +477,7 @@ const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
             error={formik.touched.experiences?.[index]?.company_name && Boolean(formik.errors.experiences?.[index]?.company_name)}
             helperText={formik.touched.experiences?.[index]?.company_name && formik.errors.experiences?.[index]?.company_name}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             name={`experiences[${index}].job_title`}
@@ -420,6 +488,7 @@ const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
             error={formik.touched.experiences?.[index]?.job_title && Boolean(formik.errors.experiences?.[index]?.job_title)}
             helperText={formik.touched.experiences?.[index]?.job_title && formik.errors.experiences?.[index]?.job_title}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             type="date"
@@ -432,6 +501,7 @@ const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
             helperText={formik.touched.experiences?.[index]?.start_date && formik.errors.experiences?.[index]?.start_date}
             InputLabelProps={{ shrink: true }}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             type="date"
@@ -445,6 +515,7 @@ const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
             InputLabelProps={{ shrink: true }}
             disabled={exp.is_current_job}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             name={`experiences[${index}].description`}
@@ -455,6 +526,7 @@ const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
             multiline
             rows={3}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <TextField
             name={`experiences[${index}].location`}
@@ -463,6 +535,7 @@ const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             fullWidth
+            sx={{ mb: 2 }}
           />
           <FormControlLabel
             control={
@@ -480,13 +553,23 @@ const ExperienceInfoStep4 = React.memo(({ formik }: { formik: any }) => {
             }
             label="Trabajo actual"
           />
+          {index > 0 && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => handleRemoveExperience(index)}
+              sx={{ mt: 2 }}
+            >
+              Eliminar Experiencia
+            </Button>
+          )}
         </Box>
       ))}
       <Button
         onClick={() =>
           formik.setFieldValue("experiences", [
             ...formik.values.experiences,
-            { company_name: "", job_title: "", start_date: "", is_current_job: false },
+            { company_name: "", job_title: "", start_date: "", end_date: "", description: "", location: "", is_current_job: false },
           ])
         }
       >
