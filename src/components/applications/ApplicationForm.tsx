@@ -1,7 +1,7 @@
 // components/JobApplicationForm.tsx
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import {
   Stepper,
   Step,
@@ -17,30 +17,9 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import axios from "axios";
-import { Education, Experience } from "@/interfaces/applications";
+import { Education, Experience, ApplicationFormInputs } from "@/interfaces/applications";
 import { debounce } from "lodash";
-import { ApplicationFormValidation } from "@/validation/applications";
-
-interface FormValues {
-  job_title: string;
-  company_name: string;
-  employment_type_id: string;
-  applicant_names: string;
-  applicant_last_names: string;
-  applicant_email: string;
-  applicant_phone: string;
-  applicant_linkedin?: string;
-  applicant_portfolio_link?: string;
-  applicant_country: string;
-  applicant_city: string;
-  applicant_address: string;
-  cv: File | null;
-  monthly_expected_salary: string;
-  availability_id: string;
-  work_modality_id: string;
-  educations: Education[];
-  experiences: Experience[];
-}
+import { ApplicationFormValidation, ApplicationFormInitialValues } from "@/forms/applications";
 
 // Step needed stuff
 const steps = [
@@ -54,27 +33,8 @@ export const ApplicationForm: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const formik = useFormik<FormValues>({
-    initialValues: {
-      job_title: "",
-      company_name: "",
-      employment_type_id: "",
-      applicant_names: "",
-      applicant_last_names: "",
-      applicant_email: "",
-      applicant_phone: "",
-      applicant_linkedin: "",
-      applicant_portfolio_link: "",
-      applicant_country: "",
-      applicant_city: "",
-      applicant_address: "",
-      cv: null,
-      monthly_expected_salary: "",
-      availability_id: "",
-      work_modality_id: "",
-      educations: [],
-      experiences: [],
-    },
+  const formik = useFormik<ApplicationFormInputs>({
+    initialValues: ApplicationFormInitialValues,
     validationSchema: ApplicationFormValidation[activeStep],
     onSubmit: async (values) => {
       if (activeStep === steps.length - 1) {
@@ -114,20 +74,17 @@ export const ApplicationForm: React.FC = () => {
   const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
-        return PersonalInfoStep1;
+        return <PersonalInfoStep1 formik={formik} />;
       case 1:
-        return JobInfoStep2;
+        return <JobInfoStep2 formik={formik} />;
       case 2:
-        return EducationInfoStep3;
+        return <EducationInfoStep3 formik={formik} />;
       case 3:
-        return ExperienceInfoStep4;
+        return <ExperienceInfoStep4 formik={formik} />;
       default:
         return null;
     }
   };
-
-  // For performance
-  // const debouncedHandleChange = debounce(formik.handleChange, 200);
 
   return (
     <Box sx={{ maxWidth: 800, mx: "auto", p: 3 }}>
@@ -422,7 +379,6 @@ const JobInfoStep2 = React.memo(({ formik }: { formik: any }) => {
   );
 });
 JobInfoStep2.displayName = "JobInfoStep2";
-
 
 const EducationInfoStep3 = React.memo(({ formik }: { formik: any }) => {
   const debouncedHandleChange = debounce(formik.handleChange, 200);
