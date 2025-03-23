@@ -70,14 +70,16 @@ export const createApplicationFormValidation = (data: ValidationData) => {
       work_modality_id: Yup.number()
         .oneOf(workModalityIds, "Seleccione una opción válida")
         .required("Requerido"),
-      cv: Yup.mixed()
+        cv: Yup.mixed<File>()
         .required("Requerido")
-        .test("fileType", "Solo se aceptan archivos PDF", (value) =>
-          value ? value.type === "application/pdf" : true
-        )
-        .test("fileSize", "El archivo no puede exceder 50MB", (value) =>
-          value ? value.size <= 51200 * 1024 : true
-        ),
+        .test("fileType", "Solo se aceptan archivos PDF", (value) => {
+          if (!value) return false;
+          return value instanceof File && value.type === "application/pdf";
+        })
+        .test("fileSize", "El archivo no puede exceder 50MB", (value) => {
+          if (!value) return false;
+          return value instanceof File && value.size <= 51200 * 1024;
+        }),
     }),
     // Step 3: Education
     Yup.object({

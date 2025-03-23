@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   Checkbox,
   CircularProgress,
+  Autocomplete,
 } from "@mui/material";
 import { useFormik } from "formik";
 import axios from "axios";
@@ -27,10 +28,8 @@ import {
   ApplicationFormInitialValues,
 } from "@/forms/applications";
 import useSWR from "swr";
-
-import {
-  fetchCatalog,
-} from "@/services";
+import { fetchCatalog } from "@/services";
+import { countries } from "@/services";
 
 const steps = [
   "Información Personal",
@@ -79,7 +78,7 @@ export const ApplicationForm: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const refresh24Hours =  60 * 60 * 24 * 1000;
+  const refresh24Hours = 60 * 60 * 24 * 1000;
 
   const { data: employmentTypes, error: employmentTypesError } = useSWR<
     CatalogItem[]
@@ -95,10 +94,16 @@ export const ApplicationForm: React.FC = () => {
   });
   const { data: workModalities, error: workModalitiesError } = useSWR<
     CatalogItem[]
-  >("/work_modalities", fetchCatalog, { refreshInterval: refresh24Hours, dedupingInterval: 5000, });
+  >("/work_modalities", fetchCatalog, {
+    refreshInterval: refresh24Hours,
+    dedupingInterval: 5000,
+  });
   const { data: availabilities, error: availabilitiesError } = useSWR<
     CatalogItem[]
-  >("/availabilities", fetchCatalog, { refreshInterval: refresh24Hours, dedupingInterval: 5000, });
+  >("/availabilities", fetchCatalog, {
+    refreshInterval: refresh24Hours,
+    dedupingInterval: 5000,
+  });
 
   const initialData: InitialData = useMemo(
     () => ({
@@ -295,6 +300,12 @@ export const ApplicationForm: React.FC = () => {
 };
 
 const PersonalInfoStep1 = React.memo(({ formik }: { formik: any }) => {
+  // Find the corresponding countryType object to the selected value of the input
+  const selectedCountry =
+    countries.find(
+      (country) => country.label === formik.values.applicant_country
+    ) || null;
+    
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <TextField
@@ -390,7 +401,8 @@ const PersonalInfoStep1 = React.memo(({ formik }: { formik: any }) => {
         }
         fullWidth
       />
-      <TextField
+
+      {/* <TextField
         name="applicant_country"
         label="País"
         value={formik.values.applicant_country || ""}
@@ -404,7 +416,66 @@ const PersonalInfoStep1 = React.memo(({ formik }: { formik: any }) => {
           formik.touched.applicant_country && formik.errors.applicant_country
         }
         fullWidth
+      /> */}
+
+      <Autocomplete
+        id="applicant_country"
+        options={countries}
+        autoHighlight
+        getOptionLabel={(option) => option.label}
+        value={selectedCountry}
+        onChange={(event, newValue) => {
+          // Actualizar el valor de Formik con el label del país seleccionado (o "" si no hay selección)
+          formik.setFieldValue(
+            "applicant_country",
+            newValue ? newValue.label : ""
+          );
+        }}
+        onBlur={() => formik.setFieldTouched("applicant_country", true)}
+        renderOption={(props, option) => {
+          const { key, ...optionProps } = props;
+          return (
+            <Box
+              key={key}
+              component="li"
+              sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+              {...optionProps}
+            >
+              <img
+                loading="lazy"
+                width="20"
+                srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                alt=""
+              />
+              {option.label} ({option.code}) +{option.phone}
+            </Box>
+          );
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="País"
+            name="applicant_country"
+            error={
+              formik.touched.applicant_country &&
+              Boolean(formik.errors.applicant_country)
+            }
+            helperText={
+              formik.touched.applicant_country &&
+              formik.errors.applicant_country
+            }
+            fullWidth
+            slotProps={{
+              htmlInput: {
+                ...params.inputProps,
+                autoComplete: "new-password", // browser's autocomplete disabled
+              },
+            }}
+          />
+        )}
       />
+
       <TextField
         name="applicant_city"
         label="Ciudad"
@@ -441,10 +512,18 @@ PersonalInfoStep1.displayName = "PersonalInfoStep1";
 
 const JobInfoStep2 = React.memo(
   ({ formik, initialData }: { formik: any; initialData: InitialData }) => {
-    if (initialData.employmentTypes.error || initialData.availabilities.error || initialData.workModalities.error) {
+    if (
+      initialData.employmentTypes.error ||
+      initialData.availabilities.error ||
+      initialData.workModalities.error
+    ) {
       return <div>Error loading data</div>;
     }
-    if (!initialData.employmentTypes.data || !initialData.availabilities.data || !initialData.workModalities.data) {
+    if (
+      !initialData.employmentTypes.data ||
+      !initialData.availabilities.data ||
+      !initialData.workModalities.data
+    ) {
       return <div>Loading...</div>;
     }
 
