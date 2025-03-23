@@ -6,8 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 async function fetchCatalog<T>(endpoint: string): Promise<T> {
   const url = `${API_URL}${endpoint}`;
   const response = await fetch(url, {
-    cache: "force-cache", // Use Data Cache
-    next: { revalidate: 60 * 60 * 24 }, // RRevalidate each 24 hours
+    cache: "no-store",
   });
 
   if (!response.ok) {
