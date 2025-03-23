@@ -1,46 +1,46 @@
 import { notFound } from 'next/navigation';
 import { ApplicationForm } from '@/components/applications';
-import {
-  getEmploymentTypes,
-  getApplicationStatuses,
-  getWorkModalities,
-  getAvailabilities,
-} from '@/services';
+// import {
+//   getEmploymentTypes,
+//   getApplicationStatuses,
+//   getWorkModalities,
+//   getAvailabilities,
+// } from '@/services';
 
-const getInitialData = async () => {
-  try {
-    const [employmentTypes, applicationStatuses, workModalities, availabilities] = await Promise.all([
-      getEmploymentTypes(),
-      getApplicationStatuses(),
-      getWorkModalities(),
-      getAvailabilities(),
-    ]);
+// const getInitialData = async () => {
+//   try {
+//     const [employmentTypes, applicationStatuses, workModalities, availabilities] = await Promise.all([
+//       getEmploymentTypes(),
+//       getApplicationStatuses(),
+//       getWorkModalities(),
+//       getAvailabilities(),
+//     ]);
 
-    return {
-      employmentTypes: employmentTypes,
-      applicationStatuses: applicationStatuses,
-      workModalities: workModalities,
-      availabilities: availabilities,
-    };
-  } catch (error) {
-    console.error('Error fetching catalog data:', error);
-    throw error;
-  }
-};
+//     return {
+//       employmentTypes: employmentTypes,
+//       applicationStatuses: applicationStatuses,
+//       workModalities: workModalities,
+//       availabilities: availabilities,
+//     };
+//   } catch (error) {
+//     console.error('Error fetching catalog data:', error);
+//     throw error;
+//   }
+// };
 
 export default async function FormPage() {
-  try {
-    const initialData = await getInitialData();
+  // try {
+  //   const initialData = await getInitialData();
 
     return (
       <>
-        <ApplicationForm initialData={initialData} />
+        <ApplicationForm />
       </>
     );
-  } catch (error) {
-    console.error(error);
-    notFound(); // Redirects to 404 if a request fails
-  }
+  // } catch (error) {
+  //   console.error(error);
+  //   notFound(); // Redirects to 404 if a request fails
+  // }
 }
 
 // 60 * 60 * 24 = 86400 -> 24 hrs

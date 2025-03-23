@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Stepper,
   Step,
@@ -26,13 +26,15 @@ import {
   ApplicationFormValidation,
   ApplicationFormInitialValues,
 } from "@/forms/applications";
+import useSWR from "swr";
 
-// import {
-//   getEmploymentTypes,
-//   getApplicationStatuses,
-//   getWorkModalities,
-//   getAvailabilities
-// } from '@/services';
+import {
+  // getEmploymentTypes,
+  // getApplicationStatuses,
+  // getWorkModalities,
+  // getAvailabilities,
+  fetchCatalog,
+} from "@/services";
 
 const steps = [
   "Información Personal",
@@ -41,16 +43,21 @@ const steps = [
   "Experiencia Laboral",
 ];
 
-interface InitialData {
-  employmentTypes: CatalogItem[];
-  applicationStatuses: CatalogItem[];
-  workModalities: CatalogItem[];
-  availabilities: CatalogItem[];
+interface returnFormat {
+  data: CatalogItem[] | undefined;
+  error: any;
 }
 
-interface ApplicationFormProps {
-  initialData: InitialData;
+interface InitialData {
+  employmentTypes: returnFormat;
+  applicationStatuses: returnFormat;
+  workModalities: returnFormat;
+  availabilities: returnFormat;
 }
+
+// interface ApplicationFormProps {
+//   initialData: InitialData;
+// }
 
 const adjustedInitialValues: ApplicationFormInputs = {
   ...ApplicationFormInitialValues,
@@ -97,13 +104,57 @@ const adjustedInitialValues: ApplicationFormInputs = {
 //   }
 // };
 
-export const ApplicationForm: React.FC<ApplicationFormProps> = ({
-  initialData,
-}: {
-  initialData: InitialData;
-}) => {
+export const ApplicationForm: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: employmentTypes, error: employmentTypesError } = useSWR<
+    CatalogItem[]
+  >("/employment_types", fetchCatalog, {
+    refreshInterval: 60 * 60 * 24 * 1000,
+  });
+  const { data: applicationStatuses, error: applicationStatusesError } = useSWR<
+    CatalogItem[]
+  >("/application_statuses", fetchCatalog, {
+    refreshInterval: 60 * 60 * 24 * 1000,
+  });
+  const { data: workModalities, error: workModalitiesError } = useSWR<
+    CatalogItem[]
+  >("/work_modalities", fetchCatalog, { refreshInterval: 60 * 60 * 24 * 1000 });
+  const { data: availabilities, error: availabilitiesError } = useSWR<
+    CatalogItem[]
+  >("/availabilities", fetchCatalog, { refreshInterval: 60 * 60 * 24 * 1000 });
+
+  const initialData: InitialData = useMemo(
+    () => ({
+      employmentTypes: {
+        data: employmentTypes,
+        error: employmentTypesError,
+      },
+      applicationStatuses: {
+        data: applicationStatuses,
+        error: applicationStatusesError,
+      },
+      workModalities: {
+        data: workModalities,
+        error: workModalitiesError,
+      },
+      availabilities: {
+        data: availabilities,
+        error: availabilitiesError,
+      },
+    }),
+    [
+      employmentTypes,
+      applicationStatuses,
+      workModalities,
+      availabilities,
+      employmentTypesError,
+      applicationStatusesError,
+      workModalitiesError,
+      availabilitiesError,
+    ]
+  );
 
   const formik = useFormik<ApplicationFormInputs>({
     initialValues: adjustedInitialValues,
@@ -214,7 +265,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
           return null;
       }
     },
-    [formik]
+    [formik, initialData]
   );
 
   return (
@@ -399,6 +450,13 @@ PersonalInfoStep1.displayName = "PersonalInfoStep1";
 
 const JobInfoStep2 = React.memo(
   ({ formik, initialData }: { formik: any; initialData: InitialData }) => {
+    if (initialData.employmentTypes.error || initialData.availabilities.error || initialData.workModalities.error) {
+      return <div>Error loading data</div>;
+    }
+    if (!initialData.employmentTypes.data || !initialData.availabilities.data || !initialData.workModalities.data) {
+      return <div>Loading...</div>;
+    }
+
     return (
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
@@ -440,7 +498,7 @@ const JobInfoStep2 = React.memo(
           }
           fullWidth
         >
-          {initialData.employmentTypes.map((type) => {
+          {initialData.employmentTypes.data.map((type) => {
             return (
               <MenuItem value={type.id} key={type.id}>
                 {type.name}
@@ -480,7 +538,7 @@ const JobInfoStep2 = React.memo(
           }
           fullWidth
         >
-          {initialData.availabilities.map((type) => {
+          {initialData.availabilities.data.map((type) => {
             return (
               <MenuItem value={type.id} key={type.id}>
                 {type.name}
@@ -504,7 +562,7 @@ const JobInfoStep2 = React.memo(
           }
           fullWidth
         >
-          {initialData.workModalities.map((type) => {
+          {initialData.workModalities.data.map((type) => {
             return (
               <MenuItem value={type.id} key={type.id}>
                 {type.name}
