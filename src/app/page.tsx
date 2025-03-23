@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { PageCard, Datatable, Titles, CustomBadge, Loader } from "@/components/ui";
 import { Box, Button } from "@mui/material";
-import { getApplicationsPaginated } from "@/services/applications";
+import { getApplicationsPaginated } from "@/services";
 import { GridColDef } from "@mui/x-data-grid";
 import { Application, PaginatedApplications } from "@/interfaces/applications";
 import { ApplicationModal } from "@/components/applications";

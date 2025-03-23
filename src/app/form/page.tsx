@@ -1,4 +1,3 @@
-// components/JobApplicationForm.tsx
 "use client";
 
 import React, { useState, useCallback } from "react";
@@ -21,11 +20,18 @@ import {
   Education,
   Experience,
   ApplicationFormInputs,
+  // CatalogItem,
 } from "@/interfaces/applications";
 import {
   ApplicationFormValidation,
   ApplicationFormInitialValues,
 } from "@/forms/applications";
+// import {
+//   getEmploymentTypes,
+//   getApplicationStatuses,
+//   getWorkModalities,
+//   getAvailabilities
+// } from '@/services';
 
 const steps = [
   "Información Personal",
@@ -44,7 +50,30 @@ const adjustedInitialValues: ApplicationFormInputs = {
   ],
 };
 
+// const getInitialData = async () => {
+//   try {
+//     const [employmentTypes, applicationStatuses, workModalities, availabilities] = await Promise.all([
+//       getEmploymentTypes(),
+//       getApplicationStatuses(),
+//       getWorkModalities(),
+//       getAvailabilities(),
+//     ]);
+
+//     return {
+//       employmentTypes: employmentTypes,
+//       applicationStatuses: applicationStatuses,
+//       workModalities: workModalities,
+//       availabilities: availabilities
+//     };
+
+//   } catch (error) {
+//     console.error('Error fetching catalog data:', error);
+//   }
+// };
+
 export const ApplicationForm: React.FC = () => {
+
+
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
