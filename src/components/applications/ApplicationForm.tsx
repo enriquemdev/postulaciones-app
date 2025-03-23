@@ -23,16 +23,12 @@ import {
   CatalogItem,
 } from "@/interfaces/applications";
 import {
-  ApplicationFormValidation,
+  createApplicationFormValidation,
   ApplicationFormInitialValues,
 } from "@/forms/applications";
 import useSWR from "swr";
 
 import {
-  // getEmploymentTypes,
-  // getApplicationStatuses,
-  // getWorkModalities,
-  // getAvailabilities,
   fetchCatalog,
 } from "@/services";
 
@@ -54,10 +50,6 @@ interface InitialData {
   workModalities: returnFormat;
   availabilities: returnFormat;
 }
-
-// interface ApplicationFormProps {
-//   initialData: InitialData;
-// }
 
 const adjustedInitialValues: ApplicationFormInputs = {
   ...ApplicationFormInitialValues,
@@ -83,47 +75,30 @@ const adjustedInitialValues: ApplicationFormInputs = {
   ],
 };
 
-// const getInitialData = async () => {
-//   try {
-//     const [employmentTypes, applicationStatuses, workModalities, availabilities] = await Promise.all([
-//       getEmploymentTypes(),
-//       getApplicationStatuses(),
-//       getWorkModalities(),
-//       getAvailabilities(),
-//     ]);
-
-//     return {
-//       employmentTypes: employmentTypes,
-//       applicationStatuses: applicationStatuses,
-//       workModalities: workModalities,
-//       availabilities: availabilities
-//     };
-
-//   } catch (error) {
-//     console.error('Error fetching catalog data:', error);
-//   }
-// };
-
 export const ApplicationForm: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const refresh24Hours =  60 * 60 * 24 * 1000;
+
   const { data: employmentTypes, error: employmentTypesError } = useSWR<
     CatalogItem[]
   >("/employment_types", fetchCatalog, {
-    refreshInterval: 60 * 60 * 24 * 1000,
+    refreshInterval: refresh24Hours,
+    dedupingInterval: 5000,
   });
   const { data: applicationStatuses, error: applicationStatusesError } = useSWR<
     CatalogItem[]
   >("/application_statuses", fetchCatalog, {
-    refreshInterval: 60 * 60 * 24 * 1000,
+    refreshInterval: refresh24Hours,
+    dedupingInterval: 5000,
   });
   const { data: workModalities, error: workModalitiesError } = useSWR<
     CatalogItem[]
-  >("/work_modalities", fetchCatalog, { refreshInterval: 60 * 60 * 24 * 1000 });
+  >("/work_modalities", fetchCatalog, { refreshInterval: refresh24Hours, dedupingInterval: 5000, });
   const { data: availabilities, error: availabilitiesError } = useSWR<
     CatalogItem[]
-  >("/availabilities", fetchCatalog, { refreshInterval: 60 * 60 * 24 * 1000 });
+  >("/availabilities", fetchCatalog, { refreshInterval: refresh24Hours, dedupingInterval: 5000, });
 
   const initialData: InitialData = useMemo(
     () => ({
@@ -156,9 +131,28 @@ export const ApplicationForm: React.FC = () => {
     ]
   );
 
+  // ID's extraction
+  const validationData = useMemo(() => {
+    const employmentTypeIds = employmentTypes?.map((item) => item.id) || [];
+    const workModalityIds = workModalities?.map((item) => item.id) || [];
+    const availabilityIds = availabilities?.map((item) => item.id) || [];
+
+    return {
+      employmentTypeIds,
+      workModalityIds,
+      availabilityIds,
+    };
+  }, [employmentTypes, workModalities, availabilities]);
+
+  // Create dynamic validation schemas with use memo to update when update received
+  const validationSchemas = useMemo(
+    () => createApplicationFormValidation(validationData),
+    [validationData]
+  );
+
   const formik = useFormik<ApplicationFormInputs>({
     initialValues: adjustedInitialValues,
-    validationSchema: ApplicationFormValidation[activeStep],
+    validationSchema: validationSchemas[activeStep],
     validateOnChange: false,
     validateOnBlur: true,
     onSubmit: async (values) => {
@@ -166,7 +160,6 @@ export const ApplicationForm: React.FC = () => {
         setIsSubmitting(true);
         const formData = new FormData();
 
-        // Manejar todos los campos excepto educations y experiences primero
         Object.entries(values).forEach(([key, value]) => {
           if (key === "cv" && value) {
             formData.append(key, value);
@@ -175,7 +168,6 @@ export const ApplicationForm: React.FC = () => {
           }
         });
 
-        // Añadir educations como un arreglo explícito
         values.educations.forEach((edu, index) => {
           formData.append(
             `educations[${index}][education_degree]`,
@@ -196,7 +188,6 @@ export const ApplicationForm: React.FC = () => {
           );
         });
 
-        // Añadir experiences como un arreglo explícito
         values.experiences.forEach((exp, index) => {
           formData.append(
             `experiences[${index}][company_name]`,
