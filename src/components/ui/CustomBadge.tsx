@@ -5,7 +5,7 @@ type PaletteColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'su
 
 interface CustomBadgeProps {
   color: PaletteColor | string;
-  text: string; // Tipo literal para los textos permitidos
+  text: string;
 }
 
 function isPaletteColor(color: string): color is PaletteColor {
@@ -21,9 +21,9 @@ export function CustomBadge({ color, text }: CustomBadgeProps) {
       sx={(theme) => ({
         display: 'inline-flex',
         alignItems: 'center',
-        minWidth: 75, // Ancho mínimo fijo
-        width: 75, // Ancho fijo
-        justifyContent: 'center', // Centrar texto
+        minWidth: 75,
+        width: 75,
+        justifyContent: 'center',
         px: 2.5,
         py: 0.5,
         borderRadius: '9999px',
@@ -36,7 +36,7 @@ export function CustomBadge({ color, text }: CustomBadgeProps) {
         '& .MuiChip-label': {
           px: 0,
           py: 0.25,
-          overflow: 'visible', // Para textos largos
+          overflow: 'visible', // FOr large texts
         },
       })}
     />

@@ -26,6 +26,7 @@ import {
 import {
   createApplicationFormValidation,
   ApplicationFormInitialValues,
+  InitialData,
 } from "@/forms/applications";
 import useSWR from "swr";
 import { fetchCatalog } from "@/services";
@@ -37,18 +38,6 @@ const steps = [
   "Educación",
   "Experiencia Laboral",
 ];
-
-interface returnFormat {
-  data: CatalogItem[] | undefined;
-  error: any;
-}
-
-interface InitialData {
-  employmentTypes: returnFormat;
-  applicationStatuses: returnFormat;
-  workModalities: returnFormat;
-  availabilities: returnFormat;
-}
 
 const adjustedInitialValues: ApplicationFormInputs = {
   ...ApplicationFormInitialValues,
