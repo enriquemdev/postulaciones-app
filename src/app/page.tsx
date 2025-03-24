@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { getApplicationsPaginated, markApplicationAsSeen } from "@/services";
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridFilterModel, GridSortModel } from "@mui/x-data-grid";
 import { Application, PaginatedApplications } from "@/interfaces/applications";
 import { ApplicationModal } from "@/components/applications";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -71,14 +71,41 @@ function ListingPageContent() {
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [filterModel, setFilterModel] = useState<GridFilterModel>({
+    items: [],
+  });
+  const [sortModel, setSortModel] = useState<GridSortModel>([]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const data = await getApplicationsPaginated(page + 1, pageSize);
+  //       setApplications(data);
+  //     } catch (err: any) {
+  //       setErrorMessage("Error al cargar las aplicaciones. Por favor, intenta de nuevo.");
+  //       setOpenErrorDialog(true);
+  //       console.error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [page, pageSize]);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await getApplicationsPaginated(page + 1, pageSize);
+        const data = await getApplicationsPaginated({
+          page: page + 1,
+          pageSize,
+          filterModel,
+          sortModel,
+        });
         setApplications(data);
       } catch (err: any) {
-        setErrorMessage("Error al cargar las aplicaciones. Por favor, intenta de nuevo.");
         setOpenErrorDialog(true);
         console.error(err);
       } finally {
@@ -87,7 +114,7 @@ function ListingPageContent() {
     };
 
     fetchData();
-  }, [page, pageSize]);
+  }, [page, pageSize, filterModel, sortModel]);
 
   const handlePaginationModelChange = (paginationModel: {
     page: number;
@@ -95,6 +122,17 @@ function ListingPageContent() {
   }) => {
     setPage(paginationModel.page);
     setPageSize(paginationModel.pageSize);
+  };
+
+  const handleFilterModelChange = (model: GridFilterModel) => {
+    console.log("Filter Model Changed:", model); // Add this to debug
+    setFilterModel(model);
+    setPage(0); // Reset to first page on filter change
+  };
+  
+  const handleSortModelChange = (model: GridSortModel) => {
+    setSortModel(model);
+    setPage(0); // Reset to first page on sort change
   };
 
   const handleOpenModal = async (application: Application) => {
@@ -120,7 +158,9 @@ function ListingPageContent() {
           };
         });
       } catch (err: any) {
-        setErrorMessage("Error al marcar la solicitud como vista. Por favor, intenta de nuevo.");
+        setErrorMessage(
+          "Error al marcar la solicitud como vista. Por favor, intenta de nuevo."
+        );
         setOpenErrorDialog(true);
         console.error(err);
         return;
@@ -255,6 +295,10 @@ function ListingPageContent() {
           pageSize={pageSize}
           rowCount={applications.total}
           onPaginationModelChange={handlePaginationModelChange}
+          filterModel={filterModel}
+          onFilterModelChange={handleFilterModelChange}
+          sortModel={sortModel}
+          onSortModelChange={handleSortModelChange}
           loading={loading}
         />
       )}

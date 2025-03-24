@@ -35,6 +35,10 @@ export const Datatable: React.FC<DatatableProps> = ({
   pageSize,
   rowCount,
   onPaginationModelChange,
+  filterModel,
+  onFilterModelChange,
+  sortModel,
+  onSortModelChange,
   loading,
 }) => {
   const apiRef = useGridApiRef();
@@ -47,47 +51,45 @@ export const Datatable: React.FC<DatatableProps> = ({
     }, 0);
 
     return () => {
-      clearInterval(timeoutId);
+      clearTimeout(timeoutId);
     };
   }, [apiRef]);
 
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <DataGrid
-          loading={loading}
-          apiRef={apiRef}
-          // checkboxSelection
-          // disableRowSelectionOnClick
-          columns={columns}
-          rows={rows}
-          autosizeOptions={autosizeOptions}
-          slots={{
-            toolbar: GridToolbar,
-          }}
-          slotProps={{
-            toolbar: {
-              showQuickFilter: true,
-              csvOptions: {
-                utf8WithBom: true,
-              },
-              printOptions: {
-                hideToolbar: true,
-              },
+    <ThemeProvider theme={theme}>
+      <DataGrid
+        loading={loading}
+        apiRef={apiRef}
+        columns={columns}
+        rows={rows}
+        autosizeOptions={autosizeOptions}
+        slots={{
+          toolbar: GridToolbar,
+        }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+            csvOptions: {
+              utf8WithBom: true,
             },
-          }}
-          ignoreDiacritics
-          paginationMode="server" // Enable server-side pagination
-          sortingMode="server"
-          filterMode="server"
-          rowCount={rowCount} // Pass rowCount from props
-          paginationModel={{ page, pageSize }} // Pass page and pageSize from props
-          onPaginationModelChange={onPaginationModelChange} // Handle pagination change
-          pageSizeOptions={[5, 10, 15, 20, 50]}
-          // disableRowSelectionOnClick
-          // density="comfortable"
-        />
-      </ThemeProvider>
-    </>
+              // printOptions: {
+              //   hideToolbar: true,
+              // },
+          },
+        }}
+        ignoreDiacritics
+        paginationMode="server"
+        sortingMode="server"
+        filterMode="server"
+        rowCount={rowCount}
+        paginationModel={{ page, pageSize }}
+        onPaginationModelChange={onPaginationModelChange}
+        pageSizeOptions={[5, 10, 15, 20, 50]}
+        filterModel={filterModel}
+        onFilterModelChange={onFilterModelChange}
+        sortModel={sortModel}
+        onSortModelChange={onSortModelChange}
+      />
+    </ThemeProvider>
   );
 };
