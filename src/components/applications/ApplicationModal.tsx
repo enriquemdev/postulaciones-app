@@ -161,7 +161,7 @@ export const ApplicationModal = ({
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullScreen={fullScreen}>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth={!fullScreen} fullScreen={fullScreen}>
       <DialogTitle
         sx={{
           display: "flex",

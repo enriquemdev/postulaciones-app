@@ -18,7 +18,7 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { getApplicationsPaginated } from "@/services";
+import { getApplicationsPaginated, markApplicationAsSeen } from "@/services";
 import { GridColDef } from "@mui/x-data-grid";
 import { Application, PaginatedApplications } from "@/interfaces/applications";
 import { ApplicationModal } from "@/components/applications";
@@ -28,7 +28,6 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import CloseIcon from "@mui/icons-material/Close";
 import dynamic from "next/dynamic";
 import { pdfjs } from "react-pdf";
-// import { SuccessToast } from "@/components/ui/SuccessToast";
 import { ErrorDialog } from "@/components/ui";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
@@ -61,13 +60,73 @@ function ListingPageContent() {
     useState<Application | null>(null);
   const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  // const [openSuccessToast, setOpenSuccessToast] = useState(false);
-  // const [successMessage, setSuccessMessage] = useState("");
   const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  const handleOpenModal = (application: Application) => {
+  const [applications, setApplications] =
+    useState<PaginatedApplications | null>(null);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const data = await getApplicationsPaginated(page + 1, pageSize);
+        setApplications(data);
+      } catch (err: any) {
+        setErrorMessage("Error al cargar las aplicaciones. Por favor, intenta de nuevo.");
+        setOpenErrorDialog(true);
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [page, pageSize]);
+
+  const handlePaginationModelChange = (paginationModel: {
+    page: number;
+    pageSize: number;
+  }) => {
+    setPage(paginationModel.page);
+    setPageSize(paginationModel.pageSize);
+  };
+
+  const handleOpenModal = async (application: Application) => {
+    if (application.application_status.application_status_code === "sent") {
+      try {
+        await markApplicationAsSeen(application.id);
+        setApplications((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            data: prev.data.map((app) =>
+              app.id === application.id
+                ? {
+                    ...app,
+                    application_status: {
+                      ...app.application_status,
+                      application_status_code: "seen",
+                      application_status_name: "Visto",
+                    },
+                  }
+                : app
+            ),
+          };
+        });
+      } catch (err: any) {
+        setErrorMessage("Error al marcar la solicitud como vista. Por favor, intenta de nuevo.");
+        setOpenErrorDialog(true);
+        console.error(err);
+        return;
+      }
+    }
+
     setSelectedApplication(application);
     setIsModalOpen(true);
   };
@@ -85,40 +144,6 @@ function ListingPageContent() {
   const handleClosePDFViewer = () => {
     setIsPDFViewerOpen(false);
     setPdfUrl(null);
-  };
-
-  const [applications, setApplications] =
-    useState<PaginatedApplications | null>(null);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await getApplicationsPaginated(page + 1, pageSize);
-        setApplications(data);
-        // Optional: Show a success toast if needed in the future
-        // setSuccessMessage("Aplicaciones cargadas con éxito");
-        // setOpenSuccessToast(true);
-      } catch (err: any) {
-        setOpenErrorDialog(true);
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [page, pageSize]);
-
-  const handlePaginationModelChange = (paginationModel: {
-    page: number;
-    pageSize: number;
-  }) => {
-    setPage(paginationModel.page);
-    setPageSize(paginationModel.pageSize);
   };
 
   const columns: GridColDef<Application>[] = useMemo(
@@ -209,12 +234,9 @@ function ListingPageContent() {
     []
   );
 
-  // const handleCloseSuccessToast = () => {
-  //   setOpenSuccessToast(false);
-  // };
-
   const handleCloseErrorDialog = () => {
     setOpenErrorDialog(false);
+    setErrorMessage("");
   };
 
   return (
@@ -249,14 +271,14 @@ function ListingPageContent() {
       <Dialog
         open={isPDFViewerOpen}
         onClose={handleClosePDFViewer}
-        fullScreen={fullScreen} // Pantalla completa en móviles
+        fullScreen={fullScreen}
         maxWidth="lg"
-        fullWidth={!fullScreen} // Ancho completo solo en escritorio
+        fullWidth={!fullScreen}
         sx={{
           "& .MuiDialog-paper": {
             display: "flex",
             flexDirection: "column",
-            margin: fullScreen ? 0 : "32px", // Sin márgenes en móviles
+            margin: fullScreen ? 0 : "32px",
             width: fullScreen ? "100%" : "auto",
             height: fullScreen ? "100%" : "auto",
           },
@@ -281,7 +303,7 @@ function ListingPageContent() {
           sx={{
             overflowY: "auto",
             flex: 1,
-            padding: fullScreen ? 1 : 2, // Menos padding en móviles
+            padding: fullScreen ? 1 : 2,
             "&::-webkit-scrollbar": {
               width: "8px",
             },
@@ -303,18 +325,10 @@ function ListingPageContent() {
         </DialogActions>
       </Dialog>
 
-      {/* Success Toast */}
-      {/* <SuccessToast
-        open={openSuccessToast}
-        message={successMessage}
-        onClose={handleCloseSuccessToast}
-        autoHideDuration={6000}
-      /> */}
-
       {/* Error Dialog */}
       <ErrorDialog
         open={openErrorDialog}
-        message="Error al cargar las aplicaciones. Por favor, intenta de nuevo."
+        message={errorMessage || "Ha ocurrido un error inesperado."}
         onClose={handleCloseErrorDialog}
         acceptText="Aceptar"
       />

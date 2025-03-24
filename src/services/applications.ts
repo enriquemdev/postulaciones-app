@@ -56,3 +56,18 @@ export const submitApplication = async (values: ApplicationFormInputs): Promise<
     throw error;
   }
 };
+
+
+export const markApplicationAsSeen = async (applicationId: number) => {
+  try {
+    const response = await axios.patch(`${API_URL}/applications/${applicationId}/mark-as-seen`, null, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error al marcar la solicitud como vista:", error);
+    throw error;
+  }
+};
