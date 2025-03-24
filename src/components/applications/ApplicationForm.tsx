@@ -14,6 +14,7 @@ import {
   Checkbox,
   CircularProgress,
   Autocomplete,
+  useMediaQuery,
 } from "@mui/material";
 import { useFormik } from "formik";
 import axios from "axios";
@@ -101,11 +102,23 @@ export const ApplicationForm: React.FC = () => {
 
   // Check for any catalog fetch errors and display ErrorDialog
   useEffect(() => {
-    if (employmentTypesError || applicationStatusesError || workModalitiesError || availabilitiesError) {
-      setErrorMessage("Error al cargar los catálogos necesarios para el formulario. Por favor, intenta de nuevo.");
+    if (
+      employmentTypesError ||
+      applicationStatusesError ||
+      workModalitiesError ||
+      availabilitiesError
+    ) {
+      setErrorMessage(
+        "Error al cargar los catálogos necesarios para el formulario. Por favor, intenta de nuevo."
+      );
       setOpenErrorDialog(true);
     }
-  }, [employmentTypesError, applicationStatusesError, workModalitiesError, availabilitiesError]);
+  }, [
+    employmentTypesError,
+    applicationStatusesError,
+    workModalitiesError,
+    availabilitiesError,
+  ]);
 
   const initialData: InitialData = useMemo(
     () => ({
@@ -185,21 +198,42 @@ export const ApplicationForm: React.FC = () => {
     });
 
     formik.values.educations.forEach((edu, index) => {
-      formData.append(`educations[${index}][education_degree]`, edu.education_degree || "");
-      formData.append(`educations[${index}][education_institution]`, edu.education_institution || "");
+      formData.append(
+        `educations[${index}][education_degree]`,
+        edu.education_degree || ""
+      );
+      formData.append(
+        `educations[${index}][education_institution]`,
+        edu.education_institution || ""
+      );
       formData.append(`educations[${index}][start_date]`, edu.start_date || "");
       formData.append(`educations[${index}][end_date]`, edu.end_date || "");
-      formData.append(`educations[${index}][is_ongoing]`, String(edu.is_ongoing ? 1 : 0));
+      formData.append(
+        `educations[${index}][is_ongoing]`,
+        String(edu.is_ongoing ? 1 : 0)
+      );
     });
 
     formik.values.experiences.forEach((exp, index) => {
-      formData.append(`experiences[${index}][company_name]`, exp.company_name || "");
+      formData.append(
+        `experiences[${index}][company_name]`,
+        exp.company_name || ""
+      );
       formData.append(`experiences[${index}][job_title]`, exp.job_title || "");
-      formData.append(`experiences[${index}][start_date]`, exp.start_date || "");
+      formData.append(
+        `experiences[${index}][start_date]`,
+        exp.start_date || ""
+      );
       formData.append(`experiences[${index}][end_date]`, exp.end_date || "");
-      formData.append(`experiences[${index}][description]`, exp.description || "");
+      formData.append(
+        `experiences[${index}][description]`,
+        exp.description || ""
+      );
       formData.append(`experiences[${index}][location]`, exp.location || "");
-      formData.append(`experiences[${index}][is_current_job]`, String(exp.is_current_job ? 1 : 0));
+      formData.append(
+        `experiences[${index}][is_current_job]`,
+        String(exp.is_current_job ? 1 : 0)
+      );
     });
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -252,12 +286,25 @@ export const ApplicationForm: React.FC = () => {
     [formik, initialData]
   );
 
+  const isMobile = useMediaQuery("(max-width:600px)");
   return (
     <Box sx={{ maxWidth: 800, mx: "auto", p: 3 }}>
       <Typography variant="h4" gutterBottom>
         Postulación a Empleo
       </Typography>
-      <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
+      <Stepper
+        activeStep={activeStep}
+        orientation={isMobile ? "vertical" : "horizontal"}
+        sx={{
+          mb: 3,
+          maxWidth: "100%",
+          width: "100%",
+          overflowX: "hidden",
+          "& .MuiStep-root": {
+            maxWidth: "100vw",
+          },
+        }}
+      >
         {steps.map((label) => (
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
@@ -322,7 +369,7 @@ const PersonalInfoStep1 = React.memo(({ formik }: { formik: any }) => {
     countries.find(
       (country) => country.label === formik.values.applicant_country
     ) || null;
-    
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <TextField
