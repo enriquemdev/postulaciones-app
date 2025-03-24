@@ -14,6 +14,7 @@ import {
   Checkbox,
   CircularProgress,
   Autocomplete,
+  FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
 import axios from "axios";
@@ -30,6 +31,8 @@ import {
 import useSWR from "swr";
 import { fetchCatalog } from "@/services";
 import { countries } from "@/services";
+import { MuiFileInput } from "mui-file-input";
+
 
 const steps = [
   "Información Personal",
@@ -640,7 +643,7 @@ const JobInfoStep2 = React.memo(
             );
           })}
         </TextField>
-        <TextField
+        {/* <TextField
           type="file"
           name="cv"
           label="CV (PDF)"
@@ -654,7 +657,36 @@ const JobInfoStep2 = React.memo(
           InputLabelProps={{ shrink: true }}
           inputProps={{ accept: "application/pdf" }}
           fullWidth
+        /> */}
+        <Box>
+        <Typography
+          component="label"
+          htmlFor="cv"
+          variant="body1"
+          sx={{ display: "block", mb: 1 }}
+        >
+          CV (PDF)
+        </Typography>
+        <MuiFileInput
+          id="cv"
+          name="cv"
+          value={formik.values.cv}
+          onChange={(newValue: File | null) => {
+            formik.setFieldValue("cv", newValue);
+          }}
+          onBlur={() => formik.setFieldTouched("cv", true)}
+          accept="application/pdf"
+          placeholder="Seleccione un archivo PDF"
+          fullWidth
+          error={formik.touched.cv && Boolean(formik.errors.cv)}
+          hideSizeText // Optional: Hide file size text as in the example
         />
+        {formik.touched.cv && formik.errors.cv && (
+          <FormHelperText error sx={{ mt: 0.5 }}>
+            {formik.errors.cv}
+          </FormHelperText>
+        )}
+      </Box>
       </Box>
     );
   }
