@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📄 Postulaciones App - Frontend
 
-## Getting Started
+Aplicación moderna para gestión de postulaciones laborales con interfaz intuitiva para candidatos y administradores.
 
-First, run the development server:
+## 🚀 Tecnologías Principales
 
+- **Next.js 15** (App Router)
+- **TypeScript**
+- **Material-UI (MUI) v6**
+- **Formik + Yup**
+- **SWR** para gestión de datos
+- **React PDF** para visualización de CVs
+
+## 🌟 Características Destacadas
+
+### Para Postulantes
+✔ Formulario multi-paso con 4 secciones  
+✔ Validación en tiempo real  
+✔ Subida de CV en PDF  
+✔ Diseño responsivo  
+
+### Para Administradores
+📋 Listado paginado de solicitudes  
+🔍 Modal de detalles completo  
+📄 Visor PDF integrado (zoom/navegación)  
+✅ Marcar postulaciones como "vistas"  
+
+## 🛠️ Configuración Local
+
+### Prerrequisitos
+- Node.js (≥ 18.x)
+- Backend Laravel ejecutándose (consulta su [README](mailto:enriquemunozdev@gmail.com)  )
+
+### Instalación
 ```bash
+# 1. Clonar repositorio
+git clone https://github.com/enriquemdev/postulaciones-app.git
+cd postulaciones-app
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Configurar entorno
+cp .env.example .env.local
+# Editar .env.local con tu URL de backend
+
+# 4. Iniciar servidor
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visita http://localhost:3000 para acceder a la aplicación.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✅ Buenas Prácticas Implementadas
+| Área               | Implementación                                                                 |
+|--------------------|-------------------------------------------------------------------------------|
+| **TypeScript**     | Tipado estricto en componentes, servicios y formularios                      |
+| **Rendimiento**    | Memoización, carga diferida, paginación del servidor                        |
+| **Código Limpio**  | Conventional Commits, estructura modular                    |
+| **UI/UX**          | Diseño responsivo, accesibilidad, feedback visual (toasts/modales)          |
+| **Gestión Estado** | SWR para caching, actualizaciones optimistas, estado local minimizado       |
 
-## Learn More
+## 📄 Componentes Clave
 
-To learn more about Next.js, take a look at the following resources:
+```mermaid
+graph TD
+    A[FormularioPostulación] --> B[Stepper]
+    B --> C[PasoInformaciónPersonal]
+    B --> D[PasoExperienciaLaboral]
+    B --> E[PasoEducación]
+    B --> F[PasoDocumentos]
+    G[AdminDashboard] --> H[DataTable]
+    H --> I[ModalDetalles]
+    H --> J[VisorPDF]
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📬 Contacto
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+¿Preguntas o sugerencias?  
+✉️ [enriquemunozdev@gmail.com](mailto:enriquemunozdev@gmail.com)  
