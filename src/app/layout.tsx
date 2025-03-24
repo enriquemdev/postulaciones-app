@@ -5,6 +5,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { Navbar } from "@/components/ui";
 import HailIcon from "@mui/icons-material/Hail";
 import { Box } from "@mui/material";
+import "@pdfslick/react/dist/pdf_viewer.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

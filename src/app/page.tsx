@@ -1,8 +1,23 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { PageCard, Datatable, Titles, CustomBadge, Loader } from "@/components/ui";
-import { Box, Button } from "@mui/material";
+import {
+  PageCard,
+  Datatable,
+  Titles,
+  CustomBadge,
+  Loader,
+} from "@/components/ui";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Typography
+} from "@mui/material";
 import { getApplicationsPaginated } from "@/services";
 import { GridColDef } from "@mui/x-data-grid";
 import { Application, PaginatedApplications } from "@/interfaces/applications";
@@ -10,6 +25,14 @@ import { ApplicationModal } from "@/components/applications";
 import DownloadIcon from "@mui/icons-material/Download";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import CloseIcon from "@mui/icons-material/Close";
+import dynamic from "next/dynamic";
+
+// src/app/page.tsx
+const PDFViewer = dynamic(() => import("@/components/PDFViewer").then((mod) => mod.default), {
+  ssr: false,
+  loading: () => <Typography>Cargando visor de PDF...</Typography>,
+});
 
 export default function Listing() {
   return (
@@ -22,10 +45,11 @@ export default function Listing() {
 }
 
 function ListingPageContent() {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] =
     useState<Application | null>(null);
+    const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const handleOpenModal = (application: Application) => {
     setSelectedApplication(application);
@@ -36,6 +60,17 @@ function ListingPageContent() {
     setIsModalOpen(false);
     setSelectedApplication(null);
   };
+
+  const handleOpenPDFViewer = (url: string) => {
+    setPdfUrl(url);
+    setIsPDFViewerOpen(true);
+  };
+
+  const handleClosePDFViewer = () => {
+    setIsPDFViewerOpen(false);
+    setPdfUrl(null);
+  };
+
   const [applications, setApplications] =
     useState<PaginatedApplications | null>(null);
   const [page, setPage] = useState(0);
@@ -113,7 +148,7 @@ function ListingPageContent() {
       {
         field: "actions",
         headerName: "Acciones",
-        renderCell: (params) =>(
+        renderCell: (params) => (
           <>
             <Button
               size="small"
@@ -136,6 +171,7 @@ function ListingPageContent() {
                 mr: "8px",
               }}
               startIcon={<PictureAsPdfIcon />}
+              onClick={() => handleOpenPDFViewer(params.row.cv_download_url)}
             >
               CV
             </Button>
@@ -164,8 +200,8 @@ function ListingPageContent() {
         title="Tabla de Postulaciones"
         subtitle="Lista de las postulaciones registradas mediante el formulario."
       />
-      
-      <Loader isVisible={loading} height={300} onlyFirstLoad={true}/>
+
+      <Loader isVisible={loading} height={300} onlyFirstLoad={true} />
       {applications && (
         <Datatable
           columns={columns}
@@ -185,6 +221,38 @@ function ListingPageContent() {
           application={selectedApplication}
         />
       )}
+
+      {/* Modal para el visor de PDF */}
+      <Dialog
+        open={isPDFViewerOpen}
+        onClose={handleClosePDFViewer}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>
+          Vista Previa del CV
+          <IconButton
+            aria-label="close"
+            onClick={handleClosePDFViewer}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {pdfUrl && <PDFViewer pdfUrl={pdfUrl} />}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePDFViewer} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
