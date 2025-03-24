@@ -159,7 +159,7 @@ export const ApplicationForm: React.FC = () => {
     initialValues: adjustedInitialValues,
     validationSchema: validationSchemas[activeStep],
     validateOnChange: false,
-    validateOnBlur: true,
+    validateOnBlur: false,
     onSubmit: async (values) => {
       if (activeStep === steps.length - 1) {
         setIsSubmitting(true);
