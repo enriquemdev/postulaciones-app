@@ -48,7 +48,7 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
         if (!response.ok) throw new Error("Error al descargar el PDF");
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
-        urlToRevoke = url; // Guardamos la URL para revocarla más tarde
+        urlToRevoke = url;
         setLocalUrl(url);
       } catch (err) {
         console.error("Error al cargar el PDF:", err);
@@ -63,14 +63,17 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
         URL.revokeObjectURL(urlToRevoke);
       }
     };
-  }, [pdfUrl]); // Solo `pdfUrl` como dependencia
+  }, [pdfUrl]); // Removed localUrl from dependencies
 
   // Configuración de PDFSlick
-  const { viewerRef, usePDFSlickStore, PDFSlickViewer } = usePDFSlick(localUrl ?? undefined, {
-    scaleValue: "page-fit",
-    singlePageViewer: singlePageView,
-    rotation: rotation,
-  });
+  const { viewerRef, usePDFSlickStore, PDFSlickViewer } = usePDFSlick(
+    localUrl ?? undefined,
+    {
+      scaleValue: "page-fit",
+      singlePageViewer: singlePageView,
+      rotation: rotation,
+    }
+  );
 
   // Obtener el estado del PDF usando usePDFSlickStore
   const pdfSlickState = usePDFSlickStore((state) => ({
@@ -150,7 +153,9 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
           <Tooltip title="Página siguiente">
             <span>
               <IconButton
-                onClick={() => pdfSlick?.gotoPage(Math.min(pageNumber + 1, numPages))}
+                onClick={() =>
+                  pdfSlick?.gotoPage(Math.min(pageNumber + 1, numPages))
+                }
                 disabled={pageNumber >= numPages}
               >
                 <NavigateNextIcon />
@@ -185,7 +190,9 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
             <InputLabel>Zoom</InputLabel>
             <Select
               value={scale}
-              onChange={(e) => pdfSlick?.zoomTo(e.target.value as number | string)}
+              onChange={(e) =>
+                pdfSlick?.zoomTo(e.target.value as number | string)
+              }
               label="Zoom"
             >
               <MenuItem value={0.5}>50%</MenuItem>
@@ -223,7 +230,11 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
               <RotateRightIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title={singlePageView ? "Vista de dos páginas" : "Vista de una página"}>
+          <Tooltip
+            title={
+              singlePageView ? "Vista de dos páginas" : "Vista de una página"
+            }
+          >
             <IconButton onClick={() => setSinglePageView((prev) => !prev)}>
               {singlePageView ? <ViewColumnIcon /> : <ViewStreamIcon />}
             </IconButton>
@@ -245,9 +256,10 @@ function PDFViewer({ pdfUrl }: PDFViewerProps) {
           border: "1px solid #ccc",
           borderRadius: "4px",
           overflow: "hidden",
+          minHeight: "500px", // Ensure minimum height
         }}
       >
-        <PDFSlickViewer {...{ viewerRef, usePDFSlickStore }} />
+        <PDFSlickViewer key={localUrl} {...{ viewerRef, usePDFSlickStore }} />
       </Box>
     </>
   );
