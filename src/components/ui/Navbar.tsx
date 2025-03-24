@@ -24,6 +24,7 @@ export function Navbar({
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
+            href={'/'}
           >
             <Icon sx={{ fontSize: { xs: '30px', sm: '40px' } }} />
           </IconButton>

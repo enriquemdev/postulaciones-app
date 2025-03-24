@@ -1,3 +1,5 @@
+'use client';
+
 import React from "react";
 import {
   Dialog,
@@ -34,6 +36,8 @@ import {
 } from "@mui/icons-material";
 import { Application, Education, Experience } from "@/interfaces/applications";
 import Grid from '@mui/material/Grid2';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 interface ApplicationModalProps {
   open: boolean;
@@ -152,8 +156,12 @@ export const ApplicationModal = ({
   onClose,
   application,
 }: ApplicationModalProps) => {
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullScreen={fullScreen}>
       <DialogTitle
         sx={{
           display: "flex",

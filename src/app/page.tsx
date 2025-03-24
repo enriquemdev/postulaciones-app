@@ -30,6 +30,8 @@ import dynamic from "next/dynamic";
 import { pdfjs } from "react-pdf";
 // import { SuccessToast } from "@/components/ui/SuccessToast";
 import { ErrorDialog } from "@/components/ui";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 // Configure the worker for react pdf
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
@@ -55,12 +57,15 @@ export default function Listing() {
 
 function ListingPageContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+  const [selectedApplication, setSelectedApplication] =
+    useState<Application | null>(null);
   const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   // const [openSuccessToast, setOpenSuccessToast] = useState(false);
   // const [successMessage, setSuccessMessage] = useState("");
   const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleOpenModal = (application: Application) => {
     setSelectedApplication(application);
@@ -82,7 +87,8 @@ function ListingPageContent() {
     setPdfUrl(null);
   };
 
-  const [applications, setApplications] = useState<PaginatedApplications | null>(null);
+  const [applications, setApplications] =
+    useState<PaginatedApplications | null>(null);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
@@ -143,7 +149,8 @@ function ListingPageContent() {
           return row.application_status.application_status_name;
         },
         renderCell: (params) => {
-          const status_code = params.row.application_status.application_status_code;
+          const status_code =
+            params.row.application_status.application_status_code;
           const status = params.row.application_status.application_status_name;
           let badgeColor = "primary";
 
@@ -238,17 +245,20 @@ function ListingPageContent() {
         />
       )}
 
-      {/* Modal for the pdf viewer */}
+      {/* PDF viewer modal */}
       <Dialog
         open={isPDFViewerOpen}
         onClose={handleClosePDFViewer}
+        fullScreen={fullScreen} // Pantalla completa en móviles
         maxWidth="lg"
-        fullWidth
+        fullWidth={!fullScreen} // Ancho completo solo en escritorio
         sx={{
           "& .MuiDialog-paper": {
-            maxHeight: "90vh",
             display: "flex",
             flexDirection: "column",
+            margin: fullScreen ? 0 : "32px", // Sin márgenes en móviles
+            width: fullScreen ? "100%" : "auto",
+            height: fullScreen ? "100%" : "auto",
           },
         }}
       >
@@ -271,7 +281,7 @@ function ListingPageContent() {
           sx={{
             overflowY: "auto",
             flex: 1,
-            padding: 0,
+            padding: fullScreen ? 1 : 2, // Menos padding en móviles
             "&::-webkit-scrollbar": {
               width: "8px",
             },
@@ -286,7 +296,7 @@ function ListingPageContent() {
         >
           {pdfUrl && <PDFViewer pdfUrl={pdfUrl} />}
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: fullScreen ? 1 : 2 }}>
           <Button onClick={handleClosePDFViewer} color="primary">
             Cerrar
           </Button>
