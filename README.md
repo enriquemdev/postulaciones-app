@@ -29,7 +29,7 @@ Aplicación moderna para gestión de postulaciones laborales con interfaz intuit
 
 ### Prerrequisitos
 - Node.js (≥ 18.x)
-- Backend Laravel ejecutándose (consulta su [README](mailto:enriquemunozdev@gmail.com)  )
+- Backend Laravel ejecutándose (consulta su [README](https://github.com/enriquemdev/postulaciones-api)  )
 
 ### Instalación
 ```bash
