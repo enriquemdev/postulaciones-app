@@ -1,6 +1,5 @@
 import { SvgIconComponent } from "@mui/icons-material";
 
-// Tipado para las rutas
 interface RouteConfig {
   path: string;
   text: string;

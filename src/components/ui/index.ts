@@ -1,3 +1,6 @@
+export { ConfirmDialog } from './ConfirmDialog';
+export { SuccessToast } from './SuccessToast';
+export { ErrorDialog } from './ErrorDialog';
 export { DynamicButton } from './DynamicButton';
 export { Navbar } from './Navbar';
 export { Datatable } from './Datatable';

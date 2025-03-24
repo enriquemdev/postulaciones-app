@@ -11,8 +11,3 @@ export const fetchCatalog = async (endpoint: string): Promise<CatalogItem[]> => 
   }
   return response.json();
 };
-
-// export const getEmploymentTypes = () => fetchCatalog('/employment_types');
-// export const getApplicationStatuses = () => fetchCatalog('/application_statuses');
-// export const getWorkModalities = () => fetchCatalog('/work_modalities');
-// export const getAvailabilities = () => fetchCatalog('/availabilities');

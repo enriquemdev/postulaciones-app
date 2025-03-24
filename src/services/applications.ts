@@ -22,7 +22,6 @@ export const getApplicationsPaginated = async (
 export const submitApplication = async (values: ApplicationFormInputs): Promise<void> => {
   const formData = new FormData();
 
-  // Manejar todos los campos excepto educations y experiences primero
   Object.entries(values).forEach(([key, value]) => {
     if (key === "cv" && value) {
       formData.append(key, value);
@@ -31,7 +30,6 @@ export const submitApplication = async (values: ApplicationFormInputs): Promise<
     }
   });
 
-  // Añadir educations como un arreglo explícito
   values.educations.forEach((edu, index) => {
     formData.append(`educations[${index}][education_degree]`, edu.education_degree || "");
     formData.append(`educations[${index}][education_institution]`, edu.education_institution || "");
@@ -40,7 +38,6 @@ export const submitApplication = async (values: ApplicationFormInputs): Promise<
     formData.append(`educations[${index}][is_ongoing]`, String(edu.is_ongoing ? 1 : 0));
   });
 
-  // Añadir experiences como un arreglo explícito
   values.experiences.forEach((exp, index) => {
     formData.append(`experiences[${index}][company_name]`, exp.company_name || "");
     formData.append(`experiences[${index}][job_title]`, exp.job_title || "");
@@ -56,6 +53,6 @@ export const submitApplication = async (values: ApplicationFormInputs): Promise<
       headers: { "Content-Type": "multipart/form-data" },
     });
   } catch (error) {
-    throw error; // Lanzamos el error para que el componente lo maneje
+    throw error;
   }
 };

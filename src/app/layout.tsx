@@ -36,7 +36,6 @@ export default function RootLayout({
           <Navbar
             icon={HailIcon}
             title="Postulaciones App"
-            buttonText="Visitar formulario"
             routes={[
               {
                 path: '/',

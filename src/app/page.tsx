@@ -25,14 +25,16 @@ import { ApplicationModal } from "@/components/applications";
 import DownloadIcon from "@mui/icons-material/Download";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import CloseIcon from "@mui/icons-material/Close";
 import dynamic from "next/dynamic";
 import { pdfjs } from "react-pdf";
-import CloseIcon from "@mui/icons-material/Close";
+// import { SuccessToast } from "@/components/ui/SuccessToast";
+import { ErrorDialog } from "@/components/ui";
 
-// COnfigure the worker for react pdf
+// Configure the worker for react pdf
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
-// Dynamically load the pdf viewr component only on the client
+// Dynamically load the pdf viewer component only on the client
 const PDFViewer = dynamic(
   () => import("@/components/PDFViewer").then((mod) => mod.default),
   {
@@ -53,10 +55,12 @@ export default function Listing() {
 
 function ListingPageContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedApplication, setSelectedApplication] =
-    useState<Application | null>(null);
-    const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
+  const [isPDFViewerOpen, setIsPDFViewerOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  // const [openSuccessToast, setOpenSuccessToast] = useState(false);
+  // const [successMessage, setSuccessMessage] = useState("");
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);
 
   const handleOpenModal = (application: Application) => {
     setSelectedApplication(application);
@@ -78,22 +82,23 @@ function ListingPageContent() {
     setPdfUrl(null);
   };
 
-  const [applications, setApplications] =
-    useState<PaginatedApplications | null>(null);
+  const [applications, setApplications] = useState<PaginatedApplications | null>(null);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null);
       try {
         const data = await getApplicationsPaginated(page + 1, pageSize);
         setApplications(data);
+        // Optional: Show a success toast if needed in the future
+        // setSuccessMessage("Aplicaciones cargadas con éxito");
+        // setOpenSuccessToast(true);
       } catch (err: any) {
-        setError(err.message || "Error fetching applications.");
+        setOpenErrorDialog(true);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -138,8 +143,7 @@ function ListingPageContent() {
           return row.application_status.application_status_name;
         },
         renderCell: (params) => {
-          const status_code =
-            params.row.application_status.application_status_code;
+          const status_code = params.row.application_status.application_status_code;
           const status = params.row.application_status.application_status_name;
           let badgeColor = "primary";
 
@@ -198,8 +202,13 @@ function ListingPageContent() {
     []
   );
 
-  // if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  // const handleCloseSuccessToast = () => {
+  //   setOpenSuccessToast(false);
+  // };
+
+  const handleCloseErrorDialog = () => {
+    setOpenErrorDialog(false);
+  };
 
   return (
     <>
@@ -228,7 +237,6 @@ function ListingPageContent() {
           application={selectedApplication}
         />
       )}
-
 
       {/* Modal for the pdf viewer */}
       <Dialog
@@ -285,6 +293,21 @@ function ListingPageContent() {
         </DialogActions>
       </Dialog>
 
+      {/* Success Toast */}
+      {/* <SuccessToast
+        open={openSuccessToast}
+        message={successMessage}
+        onClose={handleCloseSuccessToast}
+        autoHideDuration={6000}
+      /> */}
+
+      {/* Error Dialog */}
+      <ErrorDialog
+        open={openErrorDialog}
+        message="Error al cargar las aplicaciones. Por favor, intenta de nuevo."
+        onClose={handleCloseErrorDialog}
+        acceptText="Aceptar"
+      />
     </>
   );
 }

@@ -9,13 +9,13 @@ export const PageCard = ({
   return (
     <Box
       sx={{
-        mx: 'auto', // Centrado horizontal
+        mx: 'auto',
       }}
     >
       <Paper
         sx={{
-          overflow: 'hidden', // Ocultar desbordamiento
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // Sombra pequeña
+          overflow: 'hidden',
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
           borderRadius: '0.6rem',
           p: {
             xs: 1,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
   Stepper,
   Step,
@@ -29,8 +29,8 @@ import {
   InitialData,
 } from "@/forms/applications";
 import useSWR from "swr";
-import { fetchCatalog } from "@/services";
-import { countries } from "@/services";
+import { fetchCatalog, countries } from "@/services";
+import { SuccessToast, ErrorDialog, ConfirmDialog } from "@/components/ui";
 
 const steps = [
   "Información Personal",
@@ -66,6 +66,11 @@ const adjustedInitialValues: ApplicationFormInputs = {
 export const ApplicationForm: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openSuccessToast, setOpenSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
   const refresh24Hours = 60 * 60 * 24 * 1000;
 
@@ -93,6 +98,14 @@ export const ApplicationForm: React.FC = () => {
     refreshInterval: refresh24Hours,
     dedupingInterval: 5000,
   });
+
+  // Check for any catalog fetch errors and display ErrorDialog
+  useEffect(() => {
+    if (employmentTypesError || applicationStatusesError || workModalitiesError || availabilitiesError) {
+      setErrorMessage("Error al cargar los catálogos necesarios para el formulario. Por favor, intenta de nuevo.");
+      setOpenErrorDialog(true);
+    }
+  }, [employmentTypesError, applicationStatusesError, workModalitiesError, availabilitiesError]);
 
   const initialData: InitialData = useMemo(
     () => ({
@@ -149,89 +162,75 @@ export const ApplicationForm: React.FC = () => {
     validationSchema: validationSchemas[activeStep],
     validateOnChange: false,
     validateOnBlur: false,
-    onSubmit: async (values) => {
+    onSubmit: async () => {
       if (activeStep === steps.length - 1) {
-        setIsSubmitting(true);
-        const formData = new FormData();
-
-        Object.entries(values).forEach(([key, value]) => {
-          if (key === "cv" && value) {
-            formData.append(key, value);
-          } else if (key !== "educations" && key !== "experiences") {
-            formData.append(key, String(value));
-          }
-        });
-
-        values.educations.forEach((edu, index) => {
-          formData.append(
-            `educations[${index}][education_degree]`,
-            edu.education_degree || ""
-          );
-          formData.append(
-            `educations[${index}][education_institution]`,
-            edu.education_institution || ""
-          );
-          formData.append(
-            `educations[${index}][start_date]`,
-            edu.start_date || ""
-          );
-          formData.append(`educations[${index}][end_date]`, edu.end_date || "");
-          formData.append(
-            `educations[${index}][is_ongoing]`,
-            String(edu.is_ongoing ? 1 : 0)
-          );
-        });
-
-        values.experiences.forEach((exp, index) => {
-          formData.append(
-            `experiences[${index}][company_name]`,
-            exp.company_name || ""
-          );
-          formData.append(
-            `experiences[${index}][job_title]`,
-            exp.job_title || ""
-          );
-          formData.append(
-            `experiences[${index}][start_date]`,
-            exp.start_date || ""
-          );
-          formData.append(
-            `experiences[${index}][end_date]`,
-            exp.end_date || ""
-          );
-          formData.append(
-            `experiences[${index}][description]`,
-            exp.description || ""
-          );
-          formData.append(
-            `experiences[${index}][location]`,
-            exp.location || ""
-          );
-          formData.append(
-            `experiences[${index}][is_current_job]`,
-            String(exp.is_current_job ? 1 : 0)
-          );
-        });
-
-        const API_URL = process.env.NEXT_PUBLIC_API_URL;
-        try {
-          await axios.post(`${API_URL}/applications`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
-          alert("Postulación enviada con éxito");
-          formik.resetForm();
-          setActiveStep(0);
-        } catch (error) {
-          console.error(error);
-          alert("Error al enviar la postulación");
-        } finally {
-          setIsSubmitting(false);
-        }
+        setOpenConfirmDialog(true);
       } else {
         setActiveStep((prev) => prev + 1);
       }
     },
   });
+
+  const handleConfirmSubmit = async () => {
+    setOpenConfirmDialog(false);
+    setIsSubmitting(true);
+    const formData = new FormData();
+
+    Object.entries(formik.values).forEach(([key, value]) => {
+      if (key === "cv" && value) {
+        formData.append(key, value);
+      } else if (key !== "educations" && key !== "experiences") {
+        formData.append(key, String(value));
+      }
+    });
+
+    formik.values.educations.forEach((edu, index) => {
+      formData.append(`educations[${index}][education_degree]`, edu.education_degree || "");
+      formData.append(`educations[${index}][education_institution]`, edu.education_institution || "");
+      formData.append(`educations[${index}][start_date]`, edu.start_date || "");
+      formData.append(`educations[${index}][end_date]`, edu.end_date || "");
+      formData.append(`educations[${index}][is_ongoing]`, String(edu.is_ongoing ? 1 : 0));
+    });
+
+    formik.values.experiences.forEach((exp, index) => {
+      formData.append(`experiences[${index}][company_name]`, exp.company_name || "");
+      formData.append(`experiences[${index}][job_title]`, exp.job_title || "");
+      formData.append(`experiences[${index}][start_date]`, exp.start_date || "");
+      formData.append(`experiences[${index}][end_date]`, exp.end_date || "");
+      formData.append(`experiences[${index}][description]`, exp.description || "");
+      formData.append(`experiences[${index}][location]`, exp.location || "");
+      formData.append(`experiences[${index}][is_current_job]`, String(exp.is_current_job ? 1 : 0));
+    });
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    try {
+      await axios.post(`${API_URL}/applications`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setSuccessMessage("Postulación enviada con éxito");
+      setOpenSuccessToast(true);
+      formik.resetForm();
+      setActiveStep(0);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Error al enviar la postulación");
+      setOpenErrorDialog(true);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseSuccessToast = () => {
+    setOpenSuccessToast(false);
+  };
+
+  const handleCloseErrorDialog = () => {
+    setOpenErrorDialog(false);
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setOpenConfirmDialog(false);
+  };
 
   const handleBack = () => setActiveStep((prev) => prev - 1);
 
@@ -284,6 +283,35 @@ export const ApplicationForm: React.FC = () => {
           </Button>
         </Box>
       </form>
+
+      {/* Success Toast */}
+      <SuccessToast
+        open={openSuccessToast}
+        message={successMessage}
+        onClose={handleCloseSuccessToast}
+        autoHideDuration={6000}
+      />
+
+      {/* Error Dialog */}
+      <ErrorDialog
+        open={openErrorDialog}
+        message={errorMessage}
+        onClose={handleCloseErrorDialog}
+        acceptText="Aceptar"
+      />
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        open={openConfirmDialog}
+        title="Confirmar Envío"
+        message="¿Estás seguro de que deseas enviar la postulación? Asegúrate de que toda la información sea correcta."
+        onConfirm={handleConfirmSubmit}
+        onCancel={handleCloseConfirmDialog}
+        confirmText="Confirmar"
+        cancelText="Cancelar"
+        confirmButtonColor="primary"
+        isSubmitting={isSubmitting}
+      />
     </Box>
   );
 };
@@ -414,7 +442,6 @@ const PersonalInfoStep1 = React.memo(({ formik }: { formik: any }) => {
         getOptionLabel={(option) => option.label}
         value={selectedCountry}
         onChange={(event, newValue) => {
-          // Actualizar el valor de Formik con el label del país seleccionado (o "" si no hay selección)
           formik.setFieldValue(
             "applicant_country",
             newValue ? newValue.label : ""
